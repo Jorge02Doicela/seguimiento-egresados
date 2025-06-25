@@ -13,6 +13,9 @@ class CreateQuestionsTable extends Migration
             $table->foreignId('survey_id')->constrained('surveys')->onDelete('cascade');
             $table->text('question_text');
             $table->enum('type', ['option', 'scale', 'text']);
+            $table->json('options')->nullable();      // Opciones para preguntas tipo opción múltiple
+            $table->unsignedTinyInteger('scale_min')->nullable();  // Para escala (mínimo valor)
+            $table->unsignedTinyInteger('scale_max')->nullable();  // Para escala (máximo valor)
             $table->timestamps();
         });
     }

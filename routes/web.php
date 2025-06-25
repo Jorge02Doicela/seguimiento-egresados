@@ -4,6 +4,8 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GraduateProfileController;
 use App\Http\Controllers\GraduateSearchController;
+use App\Http\Controllers\Admin\SurveyController;
+use App\Http\Controllers\Graduate\SurveyResponseController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -21,23 +23,26 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Rutas exclusivas Admin
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
+// Rutas exclusivas Admin con CRUD completo para encuestas
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('surveys', SurveyController::class);
+    Route::resource('surveys', \App\Http\Controllers\Admin\SurveyController::class);
+    Route::get('/dashboard', function () {
         return view('admin.dashboard');
-    })->name('admin.dashboard');
+    })->name('dashboard');
 
-    Route::get('/admin/surveys', function () {
-        return view('admin.surveys');
-    })->name('admin.surveys');
+    // Controlador Resource para CRUD encuestas y preguntas
+    Route::resource('surveys', SurveyController::class);
 
-    Route::get('/admin/reports', function () {
+    // Puedes agregar aquí otras rutas admin si necesitas
+    Route::get('/reports', function () {
         return view('admin.reports');
-    })->name('admin.reports');
+    })->name('reports');
 });
 
 // Rutas exclusivas Egresados (graduate)
 Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate.')->group(function () {
+    // Perfil egresado
     Route::get('/profile', [GraduateProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [GraduateProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/update', [GraduateProfileController::class, 'update'])->name('profile.update');
@@ -48,12 +53,11 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
         return view('graduate.home');
     })->name('home');
 
-    Route::get('/surveys', function () {
-        return view('graduate.surveys');
-    })->name('surveys');
+    // Encuestas para responder (lista, ver formulario, enviar respuestas)
+    Route::get('/surveys', [SurveyResponseController::class, 'index'])->name('surveys.index');
+    Route::get('/surveys/{survey}', [SurveyResponseController::class, 'show'])->name('surveys.show');
+    Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->name('surveys.answers.store');
 });
-
-
 
 // Rutas exclusivas Empleadores
 Route::middleware(['auth', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {
@@ -61,7 +65,7 @@ Route::middleware(['auth', 'role:employer'])->prefix('employer')->name('employer
         return view('employer.home');
     })->name('home');
 
-    // Usamos controlador para listar graduados
+    // Controlador para listar egresados
     Route::get('/graduates', [GraduateSearchController::class, 'index'])->name('graduates');
 });
 

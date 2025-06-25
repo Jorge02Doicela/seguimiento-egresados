@@ -21,10 +21,12 @@
 
                 @role('admin')
                 <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Panel</a></li>
+<li class="nav-item"><a class="nav-link" href="{{ route('admin.surveys.index') }}">Encuestas</a></li>
                 @endrole
 
                 @role('graduate')
                 <li class="nav-item"><a class="nav-link" href="{{ route('graduate.home') }}">Egresado</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('graduate.surveys.index') }}">Responder Encuestas</a></li>
                 @endrole
 
                 @role('employer')
