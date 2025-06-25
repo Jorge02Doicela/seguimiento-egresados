@@ -22,7 +22,7 @@ class GraduateSeeder extends Seeder
 
             Graduate::create([
                 'user_id' => $user->id,
-                'cohort_year' => 2023,  // 👈 agrega esto
+                'cohort_year' => 2023,
                 'company' => 'Empresa Ejemplo S.A.',
                 'position' => 'Desarrollador',
                 'salary' => 1500.00,

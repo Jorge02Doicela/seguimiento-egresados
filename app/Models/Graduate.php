@@ -29,9 +29,9 @@ class Graduate extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Relación con habilidades
+    // Relación con Skills (muchos a muchos)
     public function skills()
     {
-        return $this->belongsToMany(Skill::class, 'graduate_skill');
+        return $this->belongsToMany(Skill::class, 'graduate_skill', 'graduate_id', 'skill_id');
     }
 }

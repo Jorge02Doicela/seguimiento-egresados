@@ -24,16 +24,25 @@
                 @endrole
 
                 @role('graduate')
-                <li class="nav-item"><a class="nav-link" href="{{ route('gradute.home') }}">Egresado</a></li>
+                <li class="nav-item"><a class="nav-link" href="{{ route('graduate.home') }}">Egresado</a></li>
                 @endrole
 
                 @role('employer')
-                <li class="nav-item"><a class="nav-link" href="{{ route('employer.home') }}">Empleador</a></li>
-                @endrole
+    <li class="nav-item"><a class="nav-link" href="{{ route('employer.home') }}">Empleador</a></li>
+    <li class="nav-item"><a class="nav-link" href="{{ route('employer.graduates') }}">Buscar Egresados</a></li>
+@endrole
+
             </ul>
 
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="{{ route('profile.edit') }}">Perfil</a></li>
+                <li class="nav-item">@role('graduate')
+    <a class="nav-link" href="{{ route('graduate.profile.edit') }}">Perfil</a>
+@elserole('admin')
+    <a class="nav-link" href="{{ route('profile.edit') }}">Perfil</a>
+@elserole('employer')
+    <a class="nav-link" href="#">Perfil empleador</a> {{-- Aquí podrías poner su ruta personalizada si existe --}}
+@endrole
+</li>
                 <li class="nav-item">
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf

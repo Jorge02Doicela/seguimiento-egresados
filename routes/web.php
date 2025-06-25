@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GraduateProfileController;
+use App\Http\Controllers\GraduateSearchController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,25 +37,32 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 // Rutas exclusivas Egresados (graduate)
-Route::middleware(['auth', 'role:graduate'])->group(function () {
-    Route::get('/graduate/home', function () {
-        return view('graduate.home');
-    })->name('graduate.home');
+Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate.')->group(function () {
+    Route::get('/profile', [GraduateProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [GraduateProfileController::class, 'edit'])->name('profile.edit');
+    Route::post('/profile/update', [GraduateProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/skills/add', [GraduateProfileController::class, 'addSkill'])->name('profile.skills.add');
+    Route::post('/profile/skills/remove', [GraduateProfileController::class, 'removeSkill'])->name('profile.skills.remove');
 
-    Route::get('/graduate/surveys', function () {
+    Route::get('/home', function () {
+        return view('graduate.home');
+    })->name('home');
+
+    Route::get('/surveys', function () {
         return view('graduate.surveys');
-    })->name('graduate.surveys');
+    })->name('surveys');
 });
 
-// Rutas exclusivas Empleadores
-Route::middleware(['auth', 'role:employer'])->group(function () {
-    Route::get('/employer/home', function () {
-        return view('employer.home');
-    })->name('employer.home');
 
-    Route::get('/employer/graduates', function () {
-        return view('employer.graduates');
-    })->name('employer.graduates');
+
+// Rutas exclusivas Empleadores
+Route::middleware(['auth', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {
+    Route::get('/home', function () {
+        return view('employer.home');
+    })->name('home');
+
+    // Usamos controlador para listar graduados
+    Route::get('/graduates', [GraduateSearchController::class, 'index'])->name('graduates');
 });
 
 require __DIR__ . '/auth.php';
