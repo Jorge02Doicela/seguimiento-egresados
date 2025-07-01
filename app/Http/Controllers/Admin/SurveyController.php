@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Survey;
 use Illuminate\Http\Request;
+use App\Models\User;
+use App\Notifications\NewSurveyNotification;
+use Illuminate\Support\Facades\Notification;  // <-- Importar Notification
 
 class SurveyController extends Controller
 {
@@ -35,13 +38,13 @@ class SurveyController extends Controller
             'questions.*.scale_max' => 'nullable|integer',
         ]);
 
-        // Crear encuesta
+        // 1. Crear encuesta
         $survey = Survey::create([
             'title' => $request->title,
             'description' => $request->description,
         ]);
 
-        // Crear preguntas
+        // 2. Crear preguntas
         foreach ($request->questions as $q) {
             $survey->questions()->create([
                 'question_text' => $q['question_text'],
@@ -52,7 +55,11 @@ class SurveyController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.surveys.index')->with('success', 'Encuesta creada correctamente');
+        // 3. Enviar notificación a todos los usuarios con rol 'graduate'
+        $graduates = User::role('graduate')->get();
+        Notification::send($graduates, new NewSurveyNotification($survey->title));
+
+        return redirect()->route('admin.surveys.index')->with('success', 'Encuesta creada y notificación enviada.');
     }
 
     // Mostrar detalles de una encuesta
@@ -93,7 +100,6 @@ class SurveyController extends Controller
         // Actualizar o crear preguntas
         foreach ($request->questions as $q) {
             if (isset($q['id'])) {
-                // Actualizar pregunta existente
                 $question = $survey->questions()->find($q['id']);
                 if ($question) {
                     $question->update([
@@ -105,7 +111,6 @@ class SurveyController extends Controller
                     ]);
                 }
             } else {
-                // Crear nueva pregunta
                 $survey->questions()->create([
                     'question_text' => $q['question_text'],
                     'type' => $q['type'],
@@ -119,7 +124,7 @@ class SurveyController extends Controller
         return redirect()->route('admin.surveys.index')->with('success', 'Encuesta actualizada correctamente');
     }
 
-    // Eliminar encuesta y sus preguntas (cascade)
+    // Eliminar encuesta
     public function destroy(Survey $survey)
     {
         $survey->delete();

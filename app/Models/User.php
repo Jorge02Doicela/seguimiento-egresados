@@ -6,6 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Graduate;
+use App\Models\Employer;
+use App\Models\Answer;
+use App\Models\Message;
 
 class User extends Authenticatable
 {
@@ -39,6 +43,7 @@ class User extends Authenticatable
         return $this->hasOne(Employer::class);
     }
 
+    // Resumen: una sola relación para perfil egresado
     public function graduateProfile()
     {
         return $this->hasOne(Graduate::class);
@@ -59,8 +64,6 @@ class User extends Authenticatable
         return $this->hasMany(Message::class, 'receiver_id');
     }
 
-    public function notifications()
-    {
-        return $this->hasMany(Notification::class);
-    }
+    // ¡Importante! No definas aquí la función notifications()
+    // El trait Notifiable ya define la relación con la tabla 'notifications'
 }

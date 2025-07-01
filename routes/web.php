@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GraduateProfileController;
 use App\Http\Controllers\GraduateSearchController;
 use App\Http\Controllers\Admin\SurveyController;
 use App\Http\Controllers\Graduate\SurveyResponseController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\NotificationController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
@@ -26,13 +28,10 @@ Route::middleware('auth')->group(function () {
 // Rutas exclusivas Admin con CRUD completo para encuestas
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('surveys', SurveyController::class);
-    Route::resource('surveys', \App\Http\Controllers\Admin\SurveyController::class);
+
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('dashboard');
-
-    // Controlador Resource para CRUD encuestas y preguntas
-    Route::resource('surveys', SurveyController::class);
 
     // Puedes agregar aquí otras rutas admin si necesitas
     Route::get('/reports', function () {
@@ -67,6 +66,24 @@ Route::middleware(['auth', 'role:employer'])->prefix('employer')->name('employer
 
     // Controlador para listar egresados
     Route::get('/graduates', [GraduateSearchController::class, 'index'])->name('graduates');
+});
+
+// Dashboard admin con controlador separado
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+});
+
+// Rutas para mensajes y notificaciones (usuarios autenticados)
+Route::middleware(['auth'])->group(function () {
+    // Mensajes
+    Route::get('messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('messages/create', [MessageController::class, 'create'])->name('messages.create');
+    Route::post('messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::post('messages/{id}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+
+    // Notificaciones
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 require __DIR__ . '/auth.php';
