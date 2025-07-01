@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom component classes if you prefer to abstract Tailwind utilities */
+@layer components {
+    .btn-primary {
+        @apply inline-flex items-center justify-center rounded-md px-6 py-2.5 font-medium transition-all duration-200;
+        @apply bg-primary text-white shadow-md;
+        @apply hover:bg-primary-dark hover:-translate-y-px hover:shadow-lg;
+    }
+    .btn-secondary {
+        @apply inline-flex items-center justify-center rounded-md px-6 py-2.5 font-medium transition-all duration-200;
+        @apply bg-accent text-text-main shadow-md;
+        @apply hover:bg-accent-dark hover:text-white hover:-translate-y-px hover:shadow-lg;
+    }
+    .btn-outline {
+        @apply inline-flex items-center justify-center rounded-md px-6 py-2.5 font-medium transition-all duration-200;
+        @apply border-2 border-primary text-primary bg-transparent;
+        @apply hover:bg-primary hover:text-white;
+    }
+    .btn-outline-white {
+        @apply inline-flex items-center justify-center rounded-md px-6 py-2.5 font-medium transition-all duration-200;
+        @apply border-2 border-white text-white bg-transparent;
+        @apply hover:bg-white hover:text-primary;
+    }
+}

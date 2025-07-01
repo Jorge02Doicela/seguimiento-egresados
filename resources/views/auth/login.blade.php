@@ -12,8 +12,8 @@
             {{-- Título del sistema ampliado con descripción y tagline --}}
             <h1 class="text-center text-white bg-blue-institutional px-5 py-3 rounded-xl shadow-xl mt-4 font-montserrat tracking-wide leading-tight">
                 {{-- Título principal (un poco más pequeño para dejar espacio) --}}
-                {{--SIVEP-Sucre Sistema de Información y Vinculación con Egresados Profesionales npm run dev--}}
-                <span class="block text-2xl sm:text-3xl font-extrabold mb-1">Sistema Académico SIVEP</span>
+                {{--Sistema de Egresados Institucional npm run dev--}}
+                <span class="block text-2xl sm:text-3xl font-extrabold mb-1">Sistema de Egresados Institucional - SEI</span>
                 {{-- Descripción y tagline (con menor tamaño y peso) --}}
                 <span class="block text-xs sm:text-sm font-normal opacity-80 mt-1">Conectando la formación académica con el futuro profesional</span>
             </h1>
@@ -29,7 +29,7 @@
 
                 {{-- Campo de Correo Institucional --}}
                 <div class="mb-6">
-                    <x-input-label for="email" :value="__('Correo Electrónico')" class="block text-sm font-semibold text-gray-700 mb-2 font-montserrat" />
+                    <x-input-label for="email" :value="__('Correo electrónico')" class="block text-sm font-semibold text-gray-700 mb-2 font-montserrat" />
                     <div class="relative rounded-lg shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             {{-- Icono de correo mejorado --}}
