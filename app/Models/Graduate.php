@@ -21,6 +21,7 @@ class Graduate extends Model
         'cv_path',
         'country',
         'city',
+
     ];
 
     // Relación con User
