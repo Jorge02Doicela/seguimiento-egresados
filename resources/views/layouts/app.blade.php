@@ -3,89 +3,106 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@yield('title', 'Gestión Egresados')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body>
+    <title>@yield('title', 'Gestión de Egresados ISUS')</title>
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    </head>
+<body class="font-open-sans antialiased bg-gray-light text-text-main">
 
     @auth
-    @if(auth()->user()->hasRole('graduate'))
-        @php
-            $unreadSurveyCount = auth()->user()->notifications()
-                ->whereNull('read_at')
-                ->where('type', 'App\Notifications\NewSurveyNotification')
-                ->count();
-        @endphp
+        @if(auth()->user()->hasRole('graduate'))
+            @php
+                $unreadSurveyCount = auth()->user()->notifications()
+                    ->whereNull('read_at')
+                    ->where('type', 'App\Notifications\NewSurveyNotification')
+                    ->count();
+            @endphp
 
-        @if($unreadSurveyCount > 0)
-            <div class="alert alert-info text-center mb-0">
-                Tienes {{ $unreadSurveyCount }} notificación(es) nueva(s).
-                <a href="{{ route('notifications.index') }}">Ver notificaciones</a>
-            </div>
+            @if($unreadSurveyCount > 0)
+                <div class="bg-yellow-accent text-white p-3 text-center text-sm font-semibold sticky top-0 z-50 shadow-md">
+                    Tienes <span class="font-bold">{{ $unreadSurveyCount }}</span> notificación(es) nueva(s).
+                    <a href="{{ route('notifications.index') }}" class="underline hover:text-primary-dark ml-2">Ver notificaciones</a>
+                </div>
+            @endif
         @endif
-    @endif
-@endauth
+    @endauth
 
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url('/') }}">Gestión Egresados</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
+    <nav class="bg-primary text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between">
+            <a class="text-2xl font-bold font-headings tracking-tight" href="/">ISUS</a>
+
+            <button class="lg:hidden text-white focus:outline-none" type="button" id="navbar-toggle">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <div class="hidden w-full lg:flex lg:w-auto lg:items-center" id="navbarSupportedContent">
                 @auth
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li class="nav-item"><a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 w-full lg:w-auto">
+                        <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('dashboard') }}">Home</a></li>
 
                         @role('admin')
-                            <li class="nav-item"><a class="nav-link" href="{{ route('admin.dashboard') }}">Admin Panel</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('admin.surveys.index') }}">Encuestas</a></li>
+                            <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('admin.dashboard') }}">Admin Panel</a></li>
+                            <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('admin.surveys.index') }}">Encuestas</a></li>
                         @endrole
 
                         @role('graduate')
-                            <li class="nav-item"><a class="nav-link" href="{{ route('graduate.home') }}">Egresado</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('graduate.surveys.index') }}">Responder Encuestas</a></li>
+                            <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('graduate.home') }}">Egresado</a></li>
+                            <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('graduate.surveys.index') }}">Responder Encuestas</a></li>
                         @endrole
 
                         @role('employer')
-                            <li class="nav-item"><a class="nav-link" href="{{ route('employer.home') }}">Empleador</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ route('employer.graduates') }}">Buscar Egresados</a></li>
+                            <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('employer.home') }}">Empleador</a></li>
+                            <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('employer.graduates') }}">Buscar Egresados</a></li>
                         @endrole
                     </ul>
 
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item">
+                    <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 lg:ml-auto">
+                        <li class="mb-2 lg:mb-0">
                             @if(auth()->user()->hasRole('graduate'))
-                                <a class="nav-link" href="{{ route('graduate.profile.edit') }}">Perfil</a>
+                                <a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('graduate.profile.edit') }}">Perfil</a>
                             @elseif(auth()->user()->hasRole('admin'))
-                                <a class="nav-link" href="{{ route('profile.edit') }}">Perfil</a>
                             @elseif(auth()->user()->hasRole('employer'))
-                                <a class="nav-link" href="#">Perfil empleador</a> {{-- Aquí podrías poner su ruta personalizada si existe --}}
+                                <a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="#">Perfil empleador</a> {{-- Aquí podrías poner su ruta personalizada si existe --}}
                             @endif
                         </li>
-                        <li class="nav-item">
+                        <li class="mb-2 lg:mb-0">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" class="btn btn-link nav-link" style="display:inline; padding:0; border:none; cursor:pointer;">Cerrar sesión</button>
+                                <button type="submit" class="w-full text-left py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200 focus:outline-none">Cerrar sesión</button>
                             </form>
                         </li>
                     </ul>
                 @else
-                    <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link" href="{{ route('login') }}">Ingresar</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('register') }}">Registrarse</a></li>
+                    <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 lg:ml-auto">
+                        <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('login') }}">Ingresar</a></li>
+                        <li class="mb-2 lg:mb-0"><a class="block py-2 px-3 rounded hover:bg-primary-dark transition-colors duration-200" href="{{ route('register') }}">Registrarse</a></li>
                     </ul>
                 @endauth
             </div>
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <main class="container mx-auto px-4 mt-8 mb-12">
         @yield('content')
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <footer class="bg-gray-corporate text-white py-8 mt-auto">
+        <div class="container mx-auto px-4 text-center">
+            <p>&copy; {{ date('Y') }} Instituto Superior Universitario Tecnológico Sucre. Todos los derechos reservados.</p>
+            <p class="text-sm mt-2">"Tu camino hacia el éxito académico y educación profesional"</p>
+        </div>
+    </footer>
+
+    <script>
+        // JavaScript para el toggle del menú en dispositivos móviles
+        document.getElementById('navbar-toggle').addEventListener('click', function() {
+            const navContent = document.getElementById('navbarSupportedContent');
+            navContent.classList.toggle('hidden');
+        });
+    </script>
+
+    @yield('scripts') {{-- Aquí se incluyen scripts adicionales específicos de cada vista --}}
 </body>
 </html>
