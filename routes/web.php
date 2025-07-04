@@ -9,7 +9,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Admin\DashboardController;  // Asegúrate de importar el controlador correcto
 
 
 Route::get('/', function () {
@@ -32,14 +32,14 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('surveys', SurveyController::class);
 
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    // Dashboard admin con controlador separado (solo una vez, aquí dentro del grupo admin)
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Puedes agregar aquí otras rutas admin si necesitas
     Route::get('/reports', function () {
         return view('admin.reports');
     })->name('reports');
+
+    // Aquí puedes agregar otras rutas admin si es necesario
 });
 
 // Rutas exclusivas Egresados (graduate)
@@ -55,7 +55,7 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
         return view('graduate.home');
     })->name('home');
 
-    // Encuestas para responder (lista, ver formulario, enviar respuestas)
+    // Encuestas para responder
     Route::get('/surveys', [SurveyResponseController::class, 'index'])->name('surveys.index');
     Route::get('/surveys/{survey}', [SurveyResponseController::class, 'show'])->name('surveys.show');
     Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->name('surveys.answers.store');
@@ -69,11 +69,6 @@ Route::middleware(['auth', 'role:employer'])->prefix('employer')->name('employer
 
     // Controlador para listar egresados
     Route::get('/graduates', [GraduateSearchController::class, 'index'])->name('graduates');
-});
-
-// Dashboard admin con controlador separado
-Route::middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 });
 
 // Rutas para mensajes y notificaciones (usuarios autenticados)

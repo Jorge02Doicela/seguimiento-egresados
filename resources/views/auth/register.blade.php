@@ -5,9 +5,6 @@
 
         {{-- Logo y Sección de Título Institucional --}}
         <div class="w-full sm:max-w-md flex flex-col items-center mb-6">
-            {{-- Logo oficial del ISUS --}}
-            <img src="https://tecnologicosucre.edu.ec/web/wp-content/uploads/2023/08/OP1-mod.png"
-                alt="Logo Instituto Tecnológico Sucre" class="h-24 sm:h-28 mb-6 drop-shadow-lg">
 
             {{-- Título del sistema ampliado con descripción y tagline --}}
             <h1 class="text-center text-white bg-blue-institutional px-5 py-3 rounded-xl shadow-xl mt-4 font-montserrat tracking-wide leading-tight">
