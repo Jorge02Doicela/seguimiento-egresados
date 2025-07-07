@@ -32,11 +32,6 @@ class RegisteredUserController extends Controller
                 'email',
                 'max:255',
                 'unique:users,email',
-                function ($attribute, $value, $fail) use ($request) {
-                    if ($request->role === 'graduate' && !str_ends_with($value, '@isus.edu.ec')) {
-                        $fail('Para registrarse como graduado, el correo debe terminar en @isus.edu.ec.');
-                    }
-                },
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'in:graduate,employer'],
