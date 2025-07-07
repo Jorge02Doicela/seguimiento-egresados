@@ -41,6 +41,7 @@ class MessageController extends Controller
         return redirect()->route('messages.inbox')->with('success', 'Mensaje enviado con éxito');
     }
 
+
     public function markAsRead(Message $message)
     {
         // Solo el receptor puede marcar como leído

@@ -8,9 +8,9 @@ use App\Http\Controllers\Graduate\SurveyResponseController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\DashboardExportController;
 
 use App\Http\Controllers\Admin\DashboardController;  // Asegúrate de importar el controlador correcto
-
 
 Route::get('/', function () {
     return view('welcome');
@@ -83,5 +83,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
+
+// Rutas para exportar datos del dashboard
+Route::get('/admin/dashboard/export/excel', [DashboardExportController::class, 'exportExcel'])->name('admin.dashboard.export.excel');
+Route::get('/admin/dashboard/export/pdf', [DashboardExportController::class, 'exportPDF'])->name('admin.dashboard.export.pdf');
+
 
 require __DIR__ . '/auth.php';

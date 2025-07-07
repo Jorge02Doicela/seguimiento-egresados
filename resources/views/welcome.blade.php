@@ -329,7 +329,6 @@
     <div>
       <strong class="block mb-1">Campus norte (matriz)</strong>
       <p>Av. 10 de Agosto N26-27 y Luis Mosquera Narváez</p>
-      <p>Tl: 02 2544735</p>
     </div>
 
     <div>
