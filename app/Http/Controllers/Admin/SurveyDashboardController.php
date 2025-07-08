@@ -17,7 +17,6 @@ class SurveyDashboardController extends Controller
     // Mostrar dashboard con filtros
     public function index(Request $request)
     {
-        // Filtros posibles: survey_id, career_id, cohort_year
         $surveys = Survey::orderBy('title')->get();
 
         $query = Answer::query()
@@ -30,9 +29,8 @@ class SurveyDashboardController extends Controller
             ->join('questions', 'answers.question_id', '=', 'questions.id')
             ->join('graduates', 'answers.user_id', '=', 'graduates.user_id')
             ->join('surveys', 'questions.survey_id', '=', 'surveys.id')
-            ->groupBy('questions.id');
+            ->groupBy('questions.id', 'questions.question_text', 'questions.type');
 
-        // Aplicar filtros
         if ($request->filled('survey_id')) {
             $query->where('surveys.id', $request->survey_id);
         }
@@ -40,20 +38,21 @@ class SurveyDashboardController extends Controller
             $query->where('graduates.career_id', $request->career_id);
         }
         if ($request->filled('cohort_year')) {
-            $query->whereYear('graduates.graduation_date', $request->cohort_year);
+            $query->where('graduates.cohort_year', $request->cohort_year);
         }
 
         $results = $query->get();
 
-        // Datos para selects en la vista
         $careers = \App\Models\Career::orderBy('name')->get();
-        $cohorts = Graduate::select(DB::raw('YEAR(graduation_date) as year'))
+        $cohorts = Graduate::select('cohort_year as year')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year');
 
+
         return view('admin.surveys.dashboard', compact('surveys', 'results', 'careers', 'cohorts'));
     }
+
 
     // Exportar Excel
     public function exportExcel(Request $request)

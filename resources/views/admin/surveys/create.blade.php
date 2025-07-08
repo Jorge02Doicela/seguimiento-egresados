@@ -84,14 +84,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">Texto de la pregunta <span class="text-danger">*</span></label>
-                    <input type="text" name="question_text" class="form-control question-text" required>
+                    <input type="text" name="questions[__INDEX__][question_text]" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Tipo de pregunta <span class="text-danger">*</span></label>
-                    <select class="form-select question-type" required>
+                    <select name="questions[__INDEX__][type]" class="form-select question-type" required>
                         <option value="">-- Seleccione tipo --</option>
-                        <option value="option">Opción múltiple (única respuesta)</option>
+                        <option value="option">Opción múltiple</option>
                         <option value="checkbox">Selección múltiple</option>
                         <option value="scale">Escala (1-5)</option>
                         <option value="boolean">Sí / No</option>
@@ -108,13 +108,13 @@
                 <div class="row scale-container" style="display:none;">
                     <div class="col">
                         <label class="form-label">Valor mínimo</label>
-                        <input type="number" class="form-control question-scale-min" min="1" max="5"
-                            value="1" readonly>
+                        <input type="number" name="questions[__INDEX__][scale_min]" class="form-control" value="1"
+                            readonly>
                     </div>
                     <div class="col">
                         <label class="form-label">Valor máximo</label>
-                        <input type="number" class="form-control question-scale-max" min="1" max="5"
-                            value="5" readonly>
+                        <input type="number" name="questions[__INDEX__][scale_max]" class="form-control" value="5"
+                            readonly>
                     </div>
                 </div>
             </div>

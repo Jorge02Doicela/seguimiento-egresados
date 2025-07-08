@@ -57,12 +57,12 @@
                     value="{{ old('end_date', optional($survey->end_date)->format('Y-m-d')) }}">
             </div>
         </div>
+
         <div class="form-check mb-3">
             <input type="checkbox" name="is_active" id="is_active" class="form-check-input" value="1"
                 {{ old('is_active', $survey->is_active) ? 'checked' : '' }}>
             <label for="is_active" class="form-check-label">Activo</label>
         </div>
-
 
         <hr>
 
@@ -156,12 +156,12 @@
 
                 <div class="mb-3">
                     <label class="form-label">Texto de la pregunta <span class="text-danger">*</span></label>
-                    <input type="text" name="questions[][question_text]" class="form-control" required>
+                    <input type="text" name="questions[__INDEX__][question_text]" class="form-control" required>
                 </div>
 
                 <div class="mb-3">
                     <label class="form-label">Tipo de pregunta <span class="text-danger">*</span></label>
-                    <select name="questions[][type]" class="form-select question-type" required>
+                    <select name="questions[__INDEX__][type]" class="form-select question-type" required>
                         <option value="">-- Seleccione tipo --</option>
                         <option value="option">Opción múltiple</option>
                         <option value="checkbox">Selección múltiple</option>
@@ -180,12 +180,12 @@
                 <div class="row scale-container" style="display:none;">
                     <div class="col">
                         <label class="form-label">Valor mínimo</label>
-                        <input type="number" name="questions[][scale_min]" class="form-control" value="1"
+                        <input type="number" name="questions[__INDEX__][scale_min]" class="form-control" value="1"
                             readonly>
                     </div>
                     <div class="col">
                         <label class="form-label">Valor máximo</label>
-                        <input type="number" name="questions[][scale_max]" class="form-control" value="5"
+                        <input type="number" name="questions[__INDEX__][scale_max]" class="form-control" value="5"
                             readonly>
                     </div>
                 </div>
@@ -201,6 +201,20 @@
             const template = document.getElementById('questionTemplate');
             const addBtn = document.getElementById('addQuestionBtn');
 
+            // Detectar el índice más alto usado en preguntas existentes
+            let lastIndex = -1;
+            container.querySelectorAll('.question-item').forEach((card) => {
+                const input = card.querySelector('input[name^="questions["]');
+                if (input) {
+                    const name = input.name; // ejemplo: questions[0][question_text]
+                    const match = name.match(/questions\[(\d+)\]/);
+                    if (match) {
+                        const idx = parseInt(match[1]);
+                        if (idx > lastIndex) lastIndex = idx;
+                    }
+                }
+            });
+
             function attachEventsToCard(card) {
                 const typeSelect = card.querySelector('.question-type');
                 const optionsContainer = card.querySelector('.options-container');
@@ -208,7 +222,7 @@
                 const optionsList = card.querySelector('.options-list');
                 const addOptionBtn = card.querySelector('.add-option-btn');
 
-                const toggleFields = () => {
+                function toggleFields() {
                     const type = typeSelect.value;
                     if (type === 'option' || type === 'checkbox') {
                         optionsContainer.style.display = 'block';
@@ -220,19 +234,27 @@
                         optionsContainer.style.display = 'none';
                         scaleContainer.style.display = 'none';
                     }
-                };
+                }
 
                 typeSelect.addEventListener('change', toggleFields);
                 toggleFields();
 
                 addOptionBtn?.addEventListener('click', () => {
+                    const questionCard = addOptionBtn.closest('.question-item');
+                    const questionTextInput = questionCard.querySelector('input[name^="questions"]');
+                    const nameAttr = questionTextInput.getAttribute(
+                    'name'); // e.g. questions[0][question_text]
+                    const match = nameAttr.match(/questions\[(\d+)\]\[question_text\]/);
+                    const questionIndex = match ? match[1] : '';
+
                     const div = document.createElement('div');
                     div.className = 'input-group mb-2';
                     div.innerHTML = `
-                    <input type="text" name="options[]" class="form-control" required>
-                    <button type="button" class="btn btn-danger remove-option-btn">Eliminar</button>
-                `;
+                        <input type="text" name="questions[${questionIndex}][options][]" class="form-control" required>
+                        <button type="button" class="btn btn-danger remove-option-btn">Eliminar</button>
+                    `;
                     optionsList.appendChild(div);
+
                     div.querySelector('.remove-option-btn').addEventListener('click', () => div.remove());
                 });
 
@@ -248,13 +270,15 @@
             }
 
             addBtn.addEventListener('click', () => {
-                const clone = template.content.cloneNode(true);
-                const newCard = clone.querySelector('.question-item');
-                container.appendChild(newCard);
+                lastIndex++;
+                let html = template.innerHTML.replace(/__INDEX__/g, lastIndex);
+                container.insertAdjacentHTML('beforeend', html);
+
+                const newCard = container.querySelector(`.question-item:last-child`);
                 attachEventsToCard(newCard);
             });
 
-            // Inicializar eventos para preguntas existentes
+            // Inicializar eventos en preguntas existentes
             container.querySelectorAll('.question-item').forEach(attachEventsToCard);
         });
     </script>

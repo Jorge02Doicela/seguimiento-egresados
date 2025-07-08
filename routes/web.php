@@ -29,27 +29,28 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Rutas exclusivas Admin con CRUD completo para encuestas
+// Rutas exclusivas Admin con CRUD completo para encuestas y dashboards
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('surveys', SurveyController::class);
-    Route::get('surveys/{survey}/clone', [SurveyController::class, 'clone'])->name('surveys.clone');
-    Route::get('surveys/dashboard', [SurveyDashboardController::class, 'index'])->name('surveys.dashboard');
 
-    // Dashboard avanzado de encuestas
-    Route::get('/surveys/dashboard', [SurveyDashboardController::class, 'index'])->name('surveys.dashboard');
-
-    // Dashboard admin
+    // Dashboard principal admin
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/reports', function () {
-        return view('admin.reports');
-    })->name('reports');
+    // Reportes generales
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports');
+    Route::get('/reports/excel', [ReportController::class, 'excel'])->name('reports.excel');
+    Route::get('/reports/pdf', [ReportController::class, 'pdf'])->name('reports.pdf');
 
-    Route::get('/surveys/dashboard/charts', [SurveyDashboardController::class, 'charts'])->name('surveys.dashboard.charts');
+    // Dashboard y exportaciones para encuestas
+    Route::get('surveys/dashboard', [SurveyDashboardController::class, 'index'])->name('surveys.dashboard');
+    Route::get('surveys/dashboard/charts', [SurveyDashboardController::class, 'charts'])->name('surveys.dashboard.charts');
+    Route::get('surveys/export/excel', [SurveyDashboardController::class, 'exportExcel'])->name('surveys.export.excel');
+    Route::get('surveys/export/pdf', [SurveyDashboardController::class, 'exportPDF'])->name('surveys.export.pdf');
 
-    // Exportaciones
-    Route::get('/surveys/export/excel', [SurveyDashboardController::class, 'exportExcel'])->name('surveys.export.excel');
-    Route::get('/surveys/export/pdf', [SurveyDashboardController::class, 'exportPDF'])->name('surveys.export.pdf');
+    // Operación especial: clonar encuesta
+    Route::get('surveys/{survey}/clone', [SurveyController::class, 'clone'])->name('surveys.clone');
+
+    // CRUD completo encuestas
+    Route::resource('surveys', SurveyController::class);
 });
 
 // Rutas exclusivas Egresados (graduate)
@@ -70,8 +71,6 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
     Route::get('/surveys', [SurveyResponseController::class, 'index'])->name('surveys.index');
     Route::get('/surveys/{survey}', [SurveyResponseController::class, 'show'])->middleware('check.survey.access')->name('surveys.show');
     Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->middleware('check.survey.access')->name('surveys.answers.store');
-    Route::get('/surveys/{survey}', [SurveyResponseController::class, 'show'])->name('surveys.show');
-    Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->name('surveys.answers.store');
 });
 
 // Rutas exclusivas Empleadores
@@ -97,14 +96,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
-// Rutas para exportar datos del dashboard
-Route::get('/admin/dashboard/export/excel', [DashboardExportController::class, 'exportExcel'])->name('admin.dashboard.export.excel');
-Route::get('/admin/dashboard/export/pdf', [DashboardExportController::class, 'exportPDF'])->name('admin.dashboard.export.pdf');
-
-Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/reports', [ReportController::class, 'index'])->name('admin.reports');
-    Route::get('/reports/excel', [ReportController::class, 'excel'])->name('admin.reports.excel');
-    Route::get('/reports/pdf', [ReportController::class, 'pdf'])->name('admin.reports.pdf');
+// Rutas para exportar datos del dashboard general admin
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard/export/excel', [DashboardExportController::class, 'exportExcel'])->name('admin.dashboard.export.excel');
+    Route::get('/dashboard/export/pdf', [DashboardExportController::class, 'exportPDF'])->name('admin.dashboard.export.pdf');
 });
 
 require __DIR__ . '/auth.php';
