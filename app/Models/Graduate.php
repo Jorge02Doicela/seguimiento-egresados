@@ -35,4 +35,9 @@ class Graduate extends Model
     {
         return $this->belongsToMany(Skill::class, 'graduate_skill', 'graduate_id', 'skill_id');
     }
+
+    public function career()
+    {
+        return $this->belongsTo(Career::class);
+    }
 }

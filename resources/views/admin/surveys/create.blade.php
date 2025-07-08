@@ -1,14 +1,15 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
-@section('title', 'Crear Encuesta')
+@section('title', 'Crear Nueva Encuesta')
 
 @section('content')
-    <h2>Crear Nueva Encuesta</h2>
+    <h1>Crear Nueva Encuesta</h1>
+
+    <a href="{{ route('admin.surveys.index') }}" class="btn btn-secondary mb-3">Volver al listado</a>
 
     @if ($errors->any())
         <div class="alert alert-danger">
-            <strong>Errores:</strong>
-            <ul>
+            <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -16,81 +17,207 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.surveys.store') }}">
+    <form action="{{ route('admin.surveys.store') }}" method="POST" id="surveyForm">
         @csrf
 
         <div class="mb-3">
-            <label>Título:</label>
-            <input type="text" name="title" class="form-control" required>
+            <label for="career_id" class="form-label">Carrera <span class="text-danger">*</span></label>
+            <select name="career_id" id="career_id" class="form-select" required>
+                <option value="">-- Seleccione Carrera --</option>
+                @foreach ($careers as $career)
+                    <option value="{{ $career->id }}" {{ old('career_id') == $career->id ? 'selected' : '' }}>
+                        {{ $career->name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="mb-3">
-            <label>Descripción:</label>
-            <textarea name="description" class="form-control"></textarea>
+            <label for="title" class="form-label">Título de la Encuesta <span class="text-danger">*</span></label>
+            <input type="text" name="title" id="title" class="form-control" value="{{ old('title') }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción</label>
+            <textarea name="description" id="description" class="form-control" rows="3">{{ old('description') }}</textarea>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="start_date" class="form-label">Fecha de inicio</label>
+                <input type="date" name="start_date" id="start_date" class="form-control"
+                    value="{{ old('start_date') }}">
+            </div>
+            <div class="col">
+                <label for="end_date" class="form-label">Fecha de fin</label>
+                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ old('end_date') }}">
+            </div>
+        </div>
+
+        <div class="form-check mb-3">
+            <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1"
+                {{ old('is_active') ? 'checked' : '' }}>
+            <label class="form-check-label" for="is_active">
+                Activa
+            </label>
         </div>
 
         <hr>
-        <h5>Preguntas</h5>
-        <div id="question-list"></div>
 
-        <button type="button" class="btn btn-secondary" onclick="addQuestion()">+ Añadir pregunta</button>
+        <h3>Preguntas</h3>
 
-        <div class="mt-4">
-            <button type="submit" class="btn btn-success">Guardar Encuesta</button>
+        <div id="questionsContainer">
+            {{-- Preguntas agregadas dinámicamente --}}
         </div>
+
+        <button type="button" class="btn btn-outline-primary mb-3" id="addQuestionBtn">Agregar Pregunta</button>
+
+        <button type="submit" class="btn btn-success">Guardar Encuesta</button>
     </form>
 
+    {{-- Plantilla de pregunta oculta para clonar --}}
+    <template id="questionTemplate">
+        <div class="card mb-3 question-item">
+            <div class="card-body">
+                <button type="button" class="btn-close float-end remove-question-btn"
+                    aria-label="Eliminar pregunta"></button>
+
+                <div class="mb-3">
+                    <label class="form-label">Texto de la pregunta <span class="text-danger">*</span></label>
+                    <input type="text" name="question_text" class="form-control question-text" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tipo de pregunta <span class="text-danger">*</span></label>
+                    <select class="form-select question-type" required>
+                        <option value="">-- Seleccione tipo --</option>
+                        <option value="option">Opción múltiple (única respuesta)</option>
+                        <option value="checkbox">Selección múltiple</option>
+                        <option value="scale">Escala (1-5)</option>
+                        <option value="boolean">Sí / No</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 options-container" style="display:none;">
+                    <label class="form-label">Opciones <span class="text-danger">*</span></label>
+                    <div class="options-list"></div>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-option-btn">Agregar
+                        opción</button>
+                </div>
+
+                <div class="row scale-container" style="display:none;">
+                    <div class="col">
+                        <label class="form-label">Valor mínimo</label>
+                        <input type="number" class="form-control question-scale-min" min="1" max="5"
+                            value="1" readonly>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Valor máximo</label>
+                        <input type="number" class="form-control question-scale-max" min="1" max="5"
+                            value="5" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+@endsection
+
+@section('scripts')
     <script>
-        let questionIndex = 0;
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            const addQuestionBtn = document.getElementById('addQuestionBtn');
+            const questionTemplate = document.getElementById('questionTemplate').content;
 
-        function addQuestion() {
-            const container = document.getElementById('question-list');
+            let questionIndex = 0;
 
-            const questionBlock = document.createElement('div');
-            questionBlock.classList.add('border', 'p-3', 'mb-3');
-            questionBlock.innerHTML = `
-        <div class="mb-2">
-            <label>Texto de la pregunta:</label>
-            <input type="text" name="questions[${questionIndex}][question_text]" class="form-control" required>
-        </div>
-        <div class="mb-2">
-            <label>Tipo:</label>
-            <select name="questions[${questionIndex}][type]" class="form-select" onchange="toggleOptions(this, ${questionIndex})" required>
-                <option value="">Selecciona tipo</option>
-                <option value="option">Opción múltiple</option>
-                <option value="scale">Escala (1-5)</option>
-                <option value="text">Texto libre</option>
-            </select>
-        </div>
-        <div class="mb-2 d-none" id="options-${questionIndex}">
-            <label>Opciones (separadas por coma):</label>
-            <input type="text" name="questions[${questionIndex}][options][]" class="form-control">
-        </div>
-        <div class="row d-none" id="scale-${questionIndex}">
-            <div class="col">
-                <label>Escala mínima:</label>
-                <input type="number" name="questions[${questionIndex}][scale_min]" class="form-control" min="1" max="10">
-            </div>
-            <div class="col">
-                <label>Escala máxima:</label>
-                <input type="number" name="questions[${questionIndex}][scale_max]" class="form-control" min="1" max="10">
-            </div>
-        </div>
-    `;
-            container.appendChild(questionBlock);
-            questionIndex++;
-        }
+            function createOptionInput(qIndex, value = '') {
+                const div = document.createElement('div');
+                div.classList.add('input-group', 'mb-2');
 
-        function toggleOptions(select, index) {
-            document.getElementById(`options-${index}`).classList.add('d-none');
-            document.getElementById(`scale-${index}`).classList.add('d-none');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = `questions[${qIndex}][options][]`;
+                input.className = 'form-control';
+                input.value = value;
+                input.required = true;
 
-            if (select.value === 'option') {
-                document.getElementById(`options-${index}`).classList.remove('d-none');
+                const btnRemove = document.createElement('button');
+                btnRemove.type = 'button';
+                btnRemove.className = 'btn btn-danger';
+                btnRemove.textContent = 'Eliminar';
+
+                btnRemove.addEventListener('click', () => div.remove());
+
+                div.appendChild(input);
+                div.appendChild(btnRemove);
+
+                return div;
             }
-            if (select.value === 'scale') {
-                document.getElementById(`scale-${index}`).classList.remove('d-none');
+
+            function toggleOptionsAndScale(questionCard, qIndex) {
+                const typeSelect = questionCard.querySelector('.question-type');
+                const optionsContainer = questionCard.querySelector('.options-container');
+                const scaleContainer = questionCard.querySelector('.scale-container');
+                const optionsList = questionCard.querySelector('.options-list');
+
+                function setRequiredForOptions(required) {
+                    optionsList.querySelectorAll('input').forEach(input => input.required = required);
+                }
+
+                const addOptionBtn = questionCard.querySelector('.add-option-btn');
+                addOptionBtn.addEventListener('click', () => {
+                    const optionInput = createOptionInput(qIndex);
+                    optionsList.appendChild(optionInput);
+                });
+
+                typeSelect.addEventListener('change', () => {
+                    const val = typeSelect.value;
+                    if (val === 'option' || val === 'checkbox') {
+                        optionsContainer.style.display = 'block';
+                        scaleContainer.style.display = 'none';
+                        setRequiredForOptions(true);
+                        if (optionsList.children.length === 0) {
+                            addOptionBtn.click();
+                        }
+                    } else if (val === 'scale') {
+                        optionsContainer.style.display = 'none';
+                        scaleContainer.style.display = 'flex';
+                        setRequiredForOptions(false);
+                    } else {
+                        optionsContainer.style.display = 'none';
+                        scaleContainer.style.display = 'none';
+                        setRequiredForOptions(false);
+                    }
+                });
+
+                typeSelect.dispatchEvent(new Event('change'));
             }
-        }
+
+            function addQuestion() {
+                const clone = document.importNode(questionTemplate, true);
+                const questionCard = clone.querySelector('.question-item');
+
+                questionCard.querySelector('.question-text').name = `questions[${questionIndex}][question_text]`;
+                questionCard.querySelector('.question-type').name = `questions[${questionIndex}][type]`;
+                questionCard.querySelector('.question-scale-min').name = `questions[${questionIndex}][scale_min]`;
+                questionCard.querySelector('.question-scale-max').name = `questions[${questionIndex}][scale_max]`;
+
+                questionsContainer.appendChild(clone);
+                const addedCard = questionsContainer.lastElementChild;
+
+                toggleOptionsAndScale(addedCard, questionIndex);
+
+                addedCard.querySelector('.remove-question-btn').addEventListener('click', () => addedCard.remove());
+
+                questionIndex++;
+            }
+
+            addQuestionBtn.addEventListener('click', addQuestion);
+
+            if (questionsContainer.children.length === 0) {
+                addQuestion();
+            }
+        });
     </script>
 @endsection

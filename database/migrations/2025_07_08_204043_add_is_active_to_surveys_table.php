@@ -9,17 +9,20 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('surveys', function (Blueprint $table) {
-            $table->boolean('active')->default(true)->after('description');
+            //
         });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::table('surveys', function (Blueprint $table) {
-            $table->dropColumn('active');
+            //
         });
     }
 };

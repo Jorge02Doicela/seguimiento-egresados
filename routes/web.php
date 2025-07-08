@@ -9,8 +9,9 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\DashboardExportController;
-
-use App\Http\Controllers\Admin\DashboardController;  // Asegúrate de importar el controlador correcto
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\SurveyDashboardController;
+use App\Http\Controllers\Admin\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -31,15 +32,24 @@ Route::middleware('auth')->group(function () {
 // Rutas exclusivas Admin con CRUD completo para encuestas
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('surveys', SurveyController::class);
+    Route::get('surveys/{survey}/clone', [SurveyController::class, 'clone'])->name('surveys.clone');
+    Route::get('surveys/dashboard', [SurveyDashboardController::class, 'index'])->name('surveys.dashboard');
 
-    // Dashboard admin con controlador separado (solo una vez, aquí dentro del grupo admin)
+    // Dashboard avanzado de encuestas
+    Route::get('/surveys/dashboard', [SurveyDashboardController::class, 'index'])->name('surveys.dashboard');
+
+    // Dashboard admin
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/reports', function () {
         return view('admin.reports');
     })->name('reports');
 
-    // Aquí puedes agregar otras rutas admin si es necesario
+    Route::get('/surveys/dashboard/charts', [SurveyDashboardController::class, 'charts'])->name('surveys.dashboard.charts');
+
+    // Exportaciones
+    Route::get('/surveys/export/excel', [SurveyDashboardController::class, 'exportExcel'])->name('surveys.export.excel');
+    Route::get('/surveys/export/pdf', [SurveyDashboardController::class, 'exportPDF'])->name('surveys.export.pdf');
 });
 
 // Rutas exclusivas Egresados (graduate)
@@ -51,12 +61,15 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
     Route::post('/profile/skills/add', [GraduateProfileController::class, 'addSkill'])->name('profile.skills.add');
     Route::post('/profile/skills/remove', [GraduateProfileController::class, 'removeSkill'])->name('profile.skills.remove');
 
+    // Home egresado
     Route::get('/home', function () {
         return view('graduate.home');
     })->name('home');
 
     // Encuestas para responder
     Route::get('/surveys', [SurveyResponseController::class, 'index'])->name('surveys.index');
+    Route::get('/surveys/{survey}', [SurveyResponseController::class, 'show'])->middleware('check.survey.access')->name('surveys.show');
+    Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->middleware('check.survey.access')->name('surveys.answers.store');
     Route::get('/surveys/{survey}', [SurveyResponseController::class, 'show'])->name('surveys.show');
     Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->name('surveys.answers.store');
 });
@@ -88,5 +101,10 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/admin/dashboard/export/excel', [DashboardExportController::class, 'exportExcel'])->name('admin.dashboard.export.excel');
 Route::get('/admin/dashboard/export/pdf', [DashboardExportController::class, 'exportPDF'])->name('admin.dashboard.export.pdf');
 
+Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/reports', [ReportController::class, 'index'])->name('admin.reports');
+    Route::get('/reports/excel', [ReportController::class, 'excel'])->name('admin.reports.excel');
+    Route::get('/reports/pdf', [ReportController::class, 'pdf'])->name('admin.reports.pdf');
+});
 
 require __DIR__ . '/auth.php';

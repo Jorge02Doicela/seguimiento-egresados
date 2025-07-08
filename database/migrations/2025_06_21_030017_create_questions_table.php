@@ -10,12 +10,12 @@ class CreateQuestionsTable extends Migration
     {
         Schema::create('questions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('survey_id')->constrained('surveys')->onDelete('cascade');
+            $table->foreignId('survey_id')->constrained()->onDelete('cascade');
             $table->text('question_text');
-            $table->enum('type', ['option', 'scale', 'text']);
-            $table->json('options')->nullable();      // Opciones para preguntas tipo opción múltiple
-            $table->unsignedTinyInteger('scale_min')->nullable();  // Para escala (mínimo valor)
-            $table->unsignedTinyInteger('scale_max')->nullable();  // Para escala (máximo valor)
+            $table->enum('type', ['option', 'checkbox', 'scale', 'boolean']);
+            $table->json('options')->nullable(); // para opciones de "option" o "checkbox"
+            $table->unsignedTinyInteger('scale_min')->nullable();
+            $table->unsignedTinyInteger('scale_max')->nullable();
             $table->timestamps();
         });
     }

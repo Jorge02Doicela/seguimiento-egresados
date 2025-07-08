@@ -1,14 +1,15 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Editar Encuesta')
 
 @section('content')
-    <h2>Editar Encuesta: {{ $survey->title }}</h2>
+    <h1>Editar Encuesta</h1>
+
+    <a href="{{ route('admin.surveys.index') }}" class="btn btn-secondary mb-3">Volver al listado</a>
 
     @if ($errors->any())
         <div class="alert alert-danger">
-            <strong>Errores:</strong>
-            <ul>
+            <ul class="mb-0">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach
@@ -16,78 +17,245 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.surveys.update', $survey) }}">
+    <form action="{{ route('admin.surveys.update', $survey) }}" method="POST" id="surveyForm">
         @csrf
         @method('PUT')
 
         <div class="mb-3">
-            <label>Título:</label>
-            <input type="text" name="title" class="form-control" value="{{ old('title', $survey->title) }}" required>
+            <label for="career_id" class="form-label">Carrera <span class="text-danger">*</span></label>
+            <select name="career_id" id="career_id" class="form-select" required>
+                <option value="">-- Seleccione Carrera --</option>
+                @foreach ($careers as $career)
+                    <option value="{{ $career->id }}"
+                        {{ old('career_id', $survey->career_id) == $career->id ? 'selected' : '' }}>
+                        {{ $career->name }}
+                    </option>
+                @endforeach
+            </select>
         </div>
 
         <div class="mb-3">
-            <label>Descripción:</label>
-            <textarea name="description" class="form-control">{{ old('description', $survey->description) }}</textarea>
+            <label for="title" class="form-label">Título de la Encuesta <span class="text-danger">*</span></label>
+            <input type="text" name="title" id="title" class="form-control"
+                value="{{ old('title', $survey->title) }}" required>
         </div>
 
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción</label>
+            <textarea name="description" id="description" class="form-control" rows="3">{{ old('description', $survey->description) }}</textarea>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col">
+                <label for="start_date" class="form-label">Fecha de inicio</label>
+                <input type="date" name="start_date" id="start_date" class="form-control"
+                    value="{{ old('start_date', optional($survey->start_date)->format('Y-m-d')) }}">
+            </div>
+            <div class="col">
+                <label for="end_date" class="form-label">Fecha de fin</label>
+                <input type="date" name="end_date" id="end_date" class="form-control"
+                    value="{{ old('end_date', optional($survey->end_date)->format('Y-m-d')) }}">
+            </div>
+        </div>
+        <div class="form-check mb-3">
+            <input type="checkbox" name="is_active" id="is_active" class="form-check-input" value="1"
+                {{ old('is_active', $survey->is_active) ? 'checked' : '' }}>
+            <label for="is_active" class="form-check-label">Activo</label>
+        </div>
+
+
         <hr>
-        <h5>Preguntas</h5>
-        <div id="question-list">
-            @foreach ($survey->questions as $index => $question)
-                <div class="border p-3 mb-3">
-                    <input type="hidden" name="questions[{{ $index }}][id]" value="{{ $question->id }}">
-                    <div class="mb-2">
-                        <label>Texto de la pregunta:</label>
-                        <input type="text" name="questions[{{ $index }}][question_text]" class="form-control"
-                            value="{{ $question->question_text }}" required>
-                    </div>
 
-                    <div class="mb-2">
-                        <label>Tipo:</label>
-                        <select name="questions[{{ $index }}][type]" class="form-select"
-                            onchange="toggleOptions(this, {{ $index }})" required>
-                            <option value="option" @selected($question->type == 'option')>Opción múltiple</option>
-                            <option value="scale" @selected($question->type == 'scale')>Escala</option>
-                            <option value="text" @selected($question->type == 'text')>Texto libre</option>
-                        </select>
-                    </div>
+        <h3>Preguntas</h3>
+        <div id="questionsContainer">
+            @foreach ($survey->questions as $i => $question)
+                <div class="card mb-3 question-item">
+                    <div class="card-body">
+                        <button type="button" class="btn-close float-end remove-question-btn"
+                            aria-label="Eliminar pregunta"></button>
 
-                    <div class="mb-2 {{ $question->type !== 'option' ? 'd-none' : '' }}" id="options-{{ $index }}">
-                        <label>Opciones (separadas por coma):</label>
-                        <input type="text" name="questions[{{ $index }}][options][]" class="form-control"
-                            value="{{ is_array($question->options) ? implode(',', $question->options) : '' }}">
-                    </div>
-
-                    <div class="row {{ $question->type !== 'scale' ? 'd-none' : '' }}" id="scale-{{ $index }}">
-                        <div class="col">
-                            <label>Escala mínima:</label>
-                            <input type="number" name="questions[{{ $index }}][scale_min]" class="form-control"
-                                min="1" max="10" value="{{ $question->scale_min }}">
+                        <div class="mb-3">
+                            <label class="form-label">Texto de la pregunta <span class="text-danger">*</span></label>
+                            <input type="text" name="questions[{{ $i }}][question_text]" class="form-control"
+                                required value="{{ old("questions.$i.question_text", $question->question_text) }}">
                         </div>
-                        <div class="col">
-                            <label>Escala máxima:</label>
-                            <input type="number" name="questions[{{ $index }}][scale_max]" class="form-control"
-                                min="1" max="10" value="{{ $question->scale_max }}">
+
+                        <div class="mb-3">
+                            <label class="form-label">Tipo de pregunta <span class="text-danger">*</span></label>
+                            <select name="questions[{{ $i }}][type]" class="form-select question-type" required>
+                                <option value="">-- Seleccione tipo --</option>
+                                <option value="option"
+                                    {{ old("questions.$i.type", $question->type) == 'option' ? 'selected' : '' }}>Opción
+                                    múltiple</option>
+                                <option value="checkbox"
+                                    {{ old("questions.$i.type", $question->type) == 'checkbox' ? 'selected' : '' }}>
+                                    Selección múltiple</option>
+                                <option value="scale"
+                                    {{ old("questions.$i.type", $question->type) == 'scale' ? 'selected' : '' }}>Escala
+                                    (1-5)</option>
+                                <option value="boolean"
+                                    {{ old("questions.$i.type", $question->type) == 'boolean' ? 'selected' : '' }}>Sí / No
+                                </option>
+                            </select>
                         </div>
+
+                        <div class="mb-3 options-container"
+                            style="{{ in_array(old("questions.$i.type", $question->type), ['option', 'checkbox']) ? 'display:block;' : 'display:none;' }}">
+                            <label class="form-label">Opciones <span class="text-danger">*</span></label>
+                            <div class="options-list">
+                                @php
+                                    $options = old(
+                                        "questions.$i.options",
+                                        is_array($question->options) ? $question->options : [],
+                                    );
+                                @endphp
+                                @foreach ($options as $opt)
+                                    <div class="input-group mb-2">
+                                        <input type="text" name="questions[{{ $i }}][options][]"
+                                            class="form-control" value="{{ $opt }}" required>
+                                        <button type="button" class="btn btn-danger remove-option-btn">Eliminar</button>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-option-btn">Agregar
+                                opción</button>
+                        </div>
+
+                        <div class="row scale-container"
+                            style="{{ old("questions.$i.type", $question->type) === 'scale' ? 'display:flex;' : 'display:none;' }}">
+                            <div class="col">
+                                <label class="form-label">Valor mínimo</label>
+                                <input type="number" name="questions[{{ $i }}][scale_min]"
+                                    class="form-control"
+                                    value="{{ old("questions.$i.scale_min", $question->scale_min ?? 1) }}" readonly>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">Valor máximo</label>
+                                <input type="number" name="questions[{{ $i }}][scale_max]"
+                                    class="form-control"
+                                    value="{{ old("questions.$i.scale_max", $question->scale_max ?? 5) }}" readonly>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="questions[{{ $i }}][id]" value="{{ $question->id }}">
                     </div>
                 </div>
             @endforeach
         </div>
 
+        <button type="button" class="btn btn-outline-primary mb-3" id="addQuestionBtn">Agregar Pregunta</button>
         <button type="submit" class="btn btn-primary">Actualizar Encuesta</button>
     </form>
 
-    <script>
-        function toggleOptions(select, index) {
-            document.getElementById(`options-${index}`).classList.add('d-none');
-            document.getElementById(`scale-${index}`).classList.add('d-none');
+    {{-- Template para nuevas preguntas --}}
+    <template id="questionTemplate">
+        <div class="card mb-3 question-item">
+            <div class="card-body">
+                <button type="button" class="btn-close float-end remove-question-btn"
+                    aria-label="Eliminar pregunta"></button>
 
-            if (select.value === 'option') {
-                document.getElementById(`options-${index}`).classList.remove('d-none');
+                <div class="mb-3">
+                    <label class="form-label">Texto de la pregunta <span class="text-danger">*</span></label>
+                    <input type="text" name="questions[][question_text]" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tipo de pregunta <span class="text-danger">*</span></label>
+                    <select name="questions[][type]" class="form-select question-type" required>
+                        <option value="">-- Seleccione tipo --</option>
+                        <option value="option">Opción múltiple</option>
+                        <option value="checkbox">Selección múltiple</option>
+                        <option value="scale">Escala (1-5)</option>
+                        <option value="boolean">Sí / No</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 options-container" style="display:none;">
+                    <label class="form-label">Opciones <span class="text-danger">*</span></label>
+                    <div class="options-list"></div>
+                    <button type="button" class="btn btn-sm btn-outline-primary mt-2 add-option-btn">Agregar
+                        opción</button>
+                </div>
+
+                <div class="row scale-container" style="display:none;">
+                    <div class="col">
+                        <label class="form-label">Valor mínimo</label>
+                        <input type="number" name="questions[][scale_min]" class="form-control" value="1"
+                            readonly>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">Valor máximo</label>
+                        <input type="number" name="questions[][scale_max]" class="form-control" value="5"
+                            readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+@endsection
+
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('questionsContainer');
+            const template = document.getElementById('questionTemplate');
+            const addBtn = document.getElementById('addQuestionBtn');
+
+            function attachEventsToCard(card) {
+                const typeSelect = card.querySelector('.question-type');
+                const optionsContainer = card.querySelector('.options-container');
+                const scaleContainer = card.querySelector('.scale-container');
+                const optionsList = card.querySelector('.options-list');
+                const addOptionBtn = card.querySelector('.add-option-btn');
+
+                const toggleFields = () => {
+                    const type = typeSelect.value;
+                    if (type === 'option' || type === 'checkbox') {
+                        optionsContainer.style.display = 'block';
+                        scaleContainer.style.display = 'none';
+                    } else if (type === 'scale') {
+                        optionsContainer.style.display = 'none';
+                        scaleContainer.style.display = 'flex';
+                    } else {
+                        optionsContainer.style.display = 'none';
+                        scaleContainer.style.display = 'none';
+                    }
+                };
+
+                typeSelect.addEventListener('change', toggleFields);
+                toggleFields();
+
+                addOptionBtn?.addEventListener('click', () => {
+                    const div = document.createElement('div');
+                    div.className = 'input-group mb-2';
+                    div.innerHTML = `
+                    <input type="text" name="options[]" class="form-control" required>
+                    <button type="button" class="btn btn-danger remove-option-btn">Eliminar</button>
+                `;
+                    optionsList.appendChild(div);
+                    div.querySelector('.remove-option-btn').addEventListener('click', () => div.remove());
+                });
+
+                card.querySelectorAll('.remove-option-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        btn.closest('.input-group').remove();
+                    });
+                });
+
+                card.querySelector('.remove-question-btn')?.addEventListener('click', () => {
+                    card.remove();
+                });
             }
-            if (select.value === 'scale') {
-                document.getElementById(`scale-${index}`).classList.remove('d-none');
-            }
-        }
+
+            addBtn.addEventListener('click', () => {
+                const clone = template.content.cloneNode(true);
+                const newCard = clone.querySelector('.question-item');
+                container.appendChild(newCard);
+                attachEventsToCard(newCard);
+            });
+
+            // Inicializar eventos para preguntas existentes
+            container.querySelectorAll('.question-item').forEach(attachEventsToCard);
+        });
     </script>
 @endsection

@@ -13,6 +13,7 @@ class CreateGraduatesTable extends Migration
             $table->foreignId('user_id')->unique()->constrained()->onDelete('cascade');
             $table->integer('cohort_year');
             $table->enum('gender', ['M', 'F', 'Otro'])->nullable();
+            $table->foreignId('career_id')->nullable()->constrained()->onDelete('set null');
             $table->string('company')->nullable();
             $table->string('position')->nullable();
             $table->decimal('salary', 10, 2)->nullable();

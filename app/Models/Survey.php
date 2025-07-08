@@ -6,9 +6,22 @@ use Illuminate\Database\Eloquent\Model;
 
 class Survey extends Model
 {
-    protected $fillable = ['title', 'description'];
+    protected $fillable = [
+        'career_id',
+        'title',
+        'description',
+        'is_active',
+        'start_date',
+        'end_date'
+    ];
 
-    // Una encuesta tiene muchas preguntas
+    // Relación con Career (pertenece a una carrera)
+    public function career()
+    {
+        return $this->belongsTo(Career::class);
+    }
+
+    // Relación con Question (tiene muchas preguntas)
     public function questions()
     {
         return $this->hasMany(Question::class);

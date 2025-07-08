@@ -1,41 +1,65 @@
 @extends('layouts.app')
 
-@section('title', 'Detalles de Encuesta')
+@section('title', 'Responder Encuesta')
 
 @section('content')
-    <h2>Detalles de la Encuesta</h2>
+    <h2>{{ $survey->title }}</h2>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">{{ $survey->title }}</h5>
-            <p class="card-text">{{ $survey->description }}</p>
-            <a href="{{ route('admin.surveys.edit', $survey) }}" class="btn btn-sm btn-warning">Editar</a>
-            <form action="{{ route('admin.surveys.destroy', $survey) }}" method="POST" class="d-inline"
-                onsubmit="return confirm('¿Estás seguro de eliminar esta encuesta?');">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-            </form>
-        </div>
-    </div>
+    <form method="POST" action="{{ route('graduate.surveys.answers.store', $survey) }}">
+        @csrf
 
-    <h4>Preguntas:</h4>
-    @foreach ($survey->questions as $question)
-        <div class="mb-3 p-3 border rounded bg-light">
-            <strong>{{ $loop->iteration }}. {{ $question->question_text }}</strong><br>
-            <span class="text-muted">Tipo: {{ ucfirst($question->type) }}</span>
+        @foreach ($survey->questions as $question)
+            <div class="mb-3">
+                <label class="form-label">{{ $question->question_text }}</label>
 
-            @if ($question->type === 'option' && is_array($question->options))
-                <ul class="mt-2">
-                    @foreach ($question->options as $opt)
-                        <li>{{ $opt }}</li>
+                @php
+                    $options = $question->options ?? [];
+                    if (is_string($options)) {
+                        $options = json_decode($options, true) ?? [];
+                    }
+                @endphp
+
+                @if ($question->type === 'option')
+                    @foreach ($options as $option)
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="answers[{{ $question->id }}]"
+                                value="{{ $option }}" required>
+                            <label class="form-check-label">{{ $option }}</label>
+                        </div>
                     @endforeach
-                </ul>
-            @elseif ($question->type === 'scale')
-                <p class="mt-2">Escala de {{ $question->scale_min }} a {{ $question->scale_max }}</p>
-            @endif
-        </div>
-    @endforeach
+                @elseif($question->type === 'checkbox')
+                    @foreach ($options as $option)
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="answers[{{ $question->id }}][]"
+                                value="{{ $option }}">
+                            <label class="form-check-label">{{ $option }}</label>
+                        </div>
+                    @endforeach
+                @elseif($question->type === 'boolean')
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answers[{{ $question->id }}]" value="Sí"
+                            required>
+                        <label class="form-check-label">Sí</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answers[{{ $question->id }}]" value="No"
+                            required>
+                        <label class="form-check-label">No</label>
+                    </div>
+                @elseif($question->type === 'scale')
+                    <select name="answers[{{ $question->id }}]" class="form-select" required>
+                        <option value="">Selecciona</option>
+                        @for ($i = $question->scale_min ?? 1; $i <= ($question->scale_max ?? 5); $i++)
+                            <option value="{{ $i }}">{{ $i }}</option>
+                        @endfor
+                    </select>
+                @elseif($question->type === 'text')
+                    <textarea name="answers[{{ $question->id }}]" class="form-control" rows="3" required></textarea>
+                @endif
+            </div>
+        @endforeach
 
-    <a href="{{ route('admin.surveys.index') }}" class="btn btn-secondary mt-4">← Volver al listado</a>
+        <button type="submit" class="btn btn-primary">Enviar respuestas</button>
+    </form>
+
 @endsection

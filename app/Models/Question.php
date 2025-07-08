@@ -12,15 +12,22 @@ class Question extends Model
         'type',
         'options',
         'scale_min',
-        'scale_max',
+        'scale_max'
     ];
 
     protected $casts = [
-        'options' => 'array', // para manejar el JSON automáticamente como array
+        'options' => 'array',
     ];
 
+    // Relación con Survey (pertenece a una encuesta)
     public function survey()
     {
         return $this->belongsTo(Survey::class);
+    }
+
+    // Relación con Answer (tiene muchas respuestas)
+    public function answers()
+    {
+        return $this->hasMany(Answer::class);
     }
 }
