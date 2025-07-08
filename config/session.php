@@ -32,7 +32,11 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+
+    //Sesión expira automáticamente si no hay actividad.
+    //Pero: la sesión caduca solo cuando se hace alguna petición o cuando el usuario intenta hacer algo y Laravel detecta que la sesión expiró.
+    'lifetime' => (int) env('SESSION_LIFETIME', 20),
+
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
@@ -129,7 +133,7 @@ return [
 
     'cookie' => env(
         'SESSION_COOKIE',
-        Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        Str::slug(env('APP_NAME', 'laravel'), '_') . '_session'
     ),
 
     /*
