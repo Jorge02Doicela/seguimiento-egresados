@@ -3,52 +3,52 @@
 @section('title', 'Crear Encuesta')
 
 @section('content')
-<h2>Crear Nueva Encuesta</h2>
+    <h2>Crear Nueva Encuesta</h2>
 
-@if($errors->any())
-    <div class="alert alert-danger">
-        <strong>Errores:</strong>
-        <ul>
-            @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <strong>Errores:</strong>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
-<form method="POST" action="{{ route('admin.surveys.store') }}">
-    @csrf
+    <form method="POST" action="{{ route('admin.surveys.store') }}">
+        @csrf
 
-    <div class="mb-3">
-        <label>Título:</label>
-        <input type="text" name="title" class="form-control" required>
-    </div>
+        <div class="mb-3">
+            <label>Título:</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
 
-    <div class="mb-3">
-        <label>Descripción:</label>
-        <textarea name="description" class="form-control"></textarea>
-    </div>
+        <div class="mb-3">
+            <label>Descripción:</label>
+            <textarea name="description" class="form-control"></textarea>
+        </div>
 
-    <hr>
-    <h5>Preguntas</h5>
-    <div id="question-list"></div>
+        <hr>
+        <h5>Preguntas</h5>
+        <div id="question-list"></div>
 
-    <button type="button" class="btn btn-secondary" onclick="addQuestion()">+ Añadir pregunta</button>
+        <button type="button" class="btn btn-secondary" onclick="addQuestion()">+ Añadir pregunta</button>
 
-    <div class="mt-4">
-        <button type="submit" class="btn btn-success">Guardar Encuesta</button>
-    </div>
-</form>
+        <div class="mt-4">
+            <button type="submit" class="btn btn-success">Guardar Encuesta</button>
+        </div>
+    </form>
 
-<script>
-let questionIndex = 0;
+    <script>
+        let questionIndex = 0;
 
-function addQuestion() {
-    const container = document.getElementById('question-list');
+        function addQuestion() {
+            const container = document.getElementById('question-list');
 
-    const questionBlock = document.createElement('div');
-    questionBlock.classList.add('border', 'p-3', 'mb-3');
-    questionBlock.innerHTML = `
+            const questionBlock = document.createElement('div');
+            questionBlock.classList.add('border', 'p-3', 'mb-3');
+            questionBlock.innerHTML = `
         <div class="mb-2">
             <label>Texto de la pregunta:</label>
             <input type="text" name="questions[${questionIndex}][question_text]" class="form-control" required>
@@ -77,20 +77,20 @@ function addQuestion() {
             </div>
         </div>
     `;
-    container.appendChild(questionBlock);
-    questionIndex++;
-}
+            container.appendChild(questionBlock);
+            questionIndex++;
+        }
 
-function toggleOptions(select, index) {
-    document.getElementById(`options-${index}`).classList.add('d-none');
-    document.getElementById(`scale-${index}`).classList.add('d-none');
+        function toggleOptions(select, index) {
+            document.getElementById(`options-${index}`).classList.add('d-none');
+            document.getElementById(`scale-${index}`).classList.add('d-none');
 
-    if (select.value === 'option') {
-        document.getElementById(`options-${index}`).classList.remove('d-none');
-    }
-    if (select.value === 'scale') {
-        document.getElementById(`scale-${index}`).classList.remove('d-none');
-    }
-}
-</script>
+            if (select.value === 'option') {
+                document.getElementById(`options-${index}`).classList.remove('d-none');
+            }
+            if (select.value === 'scale') {
+                document.getElementById(`scale-${index}`).classList.remove('d-none');
+            }
+        }
+    </script>
 @endsection
