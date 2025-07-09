@@ -8,7 +8,7 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <p><strong>Año de cohorte:</strong> {{ $graduate->cohort_year }}</p>
+        <p><strong>Año de cohorte de egreso:</strong> {{ $graduate->cohort_year }}</p>
         <p><strong>Género:</strong> {{ $graduate->gender }}</p>
 
         <p><strong>¿Está trabajando actualmente?</strong>

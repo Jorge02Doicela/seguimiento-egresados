@@ -34,7 +34,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="cohort_year" class="form-label">Año de cohorte</label>
+                <label for="cohort_year" class="form-label">Año de cohorte de egreso</label>
                 <input type="number" name="cohort_year" id="cohort_year" class="form-control"
                     value="{{ old('cohort_year', $graduate->cohort_year) }}" required>
             </div>
