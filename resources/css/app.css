@@ -2,8 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* === PERSONALIZACIONES DE ESTILO PREMIUM ISUS === */
+/* === PERSONALIZACIONES DE ESTILO PREMIUM ISUS + VARIABLES CSS === */
+
 @layer base {
+    /* Variables CSS para colores personalizados */
+    :root {
+        /* Colores de error */
+        --color-error: #dc2626;
+        --color-error-light: #fef2f2;
+        --color-error-dark: #991b1b;
+
+        /* Colores institucionales */
+        --color-blue-institutional: #1e40af;
+        --color-blue-institutional-dark: #1e3a8a;
+        --color-primary: #2563eb;
+        --color-secondary: #64748b;
+        --color-text-primary: #1f2937;
+        --color-text-secondary: #4b5563;
+        --color-text-muted: #6b7280;
+        --color-primary-lightest: #e0e7ff;
+    }
+
+    /* Estilos base de texto y fondo */
     html {
         @apply font-body text-text-primary bg-bg-primary;
     }
@@ -32,7 +52,16 @@
 }
 
 @layer components {
-    /* === BOTÓN BASE === */
+    /* Fuentes personalizadas */
+    .font-montserrat {
+        font-family: "Montserrat", sans-serif;
+    }
+
+    .font-open-sans {
+        font-family: "Open Sans", sans-serif;
+    }
+
+    /* Botones base y variantes */
     .btn {
         @apply inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2;
     }
@@ -49,16 +78,19 @@
         @apply border border-primary text-primary bg-transparent hover:bg-primary hover:text-white;
     }
 
+    /* Tarjetas */
     .card {
         @apply bg-white shadow-primary-lg rounded-2xl p-4;
     }
 
+    /* Formularios */
     .form-input,
     .form-select,
     .form-textarea {
         @apply mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50;
     }
 
+    /* Badges */
     .badge {
         @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-light text-gray-carbon;
     }
@@ -77,7 +109,93 @@
 }
 
 @layer utilities {
-    /* === TEXTO CON DEGRADADO === */
+    /* Colores de error */
+    .text-error {
+        color: var(--color-error);
+    }
+
+    .text-error-dark {
+        color: var(--color-error-dark);
+    }
+
+    .bg-error-light {
+        background-color: var(--color-error-light);
+    }
+
+    .border-error {
+        border-color: var(--color-error);
+    }
+
+    /* Colores institucionales */
+    .bg-blue-institutional {
+        background-color: var(--color-blue-institutional);
+    }
+
+    .bg-blue-institutional-dark {
+        background-color: var(--color-blue-institutional-dark);
+    }
+
+    .text-blue-institutional {
+        color: var(--color-blue-institutional);
+    }
+
+    .text-primary {
+        color: var(--color-primary);
+    }
+
+    .text-secondary {
+        color: var(--color-secondary);
+    }
+
+    .text-text-primary {
+        color: var(--color-text-primary);
+    }
+
+    .text-text-secondary {
+        color: var(--color-text-secondary);
+    }
+
+    .text-text-muted {
+        color: var(--color-text-muted);
+    }
+
+    .border-secondary {
+        border-color: var(--color-secondary);
+    }
+
+    .border-primary {
+        border-color: var(--color-primary);
+    }
+
+    .border-primary-lightest {
+        border-color: var(--color-primary-lightest);
+    }
+
+    /* Sombras personalizadas */
+    .shadow-primary {
+        box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1),
+            0 2px 4px -1px rgba(37, 99, 235, 0.06);
+    }
+
+    .shadow-3xl {
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Focus ring personalizado */
+    .focus\:ring-primary:focus {
+        --tw-ring-color: var(--color-primary);
+    }
+
+    .focus\:ring-blue-institutional:focus {
+        --tw-ring-color: var(--color-blue-institutional);
+    }
+
+    /* Hover effects personalizados */
+    .hover\:bg-blue-institutional-dark:hover {
+        background-color: var(--color-blue-institutional-dark);
+    }
+
+    /* Texto con degradado */
     .text-gradient {
         background: linear-gradient(135deg, #0052cc 0%, #3b82f6 100%);
         -webkit-background-clip: text;
@@ -92,6 +210,7 @@
         background-clip: text;
     }
 
+    /* Scrollbar utilities */
     .scrollbar-hide {
         -ms-overflow-style: none;
         scrollbar-width: none;
@@ -106,11 +225,13 @@
         scrollbar-color: #6b7280 #f3f4f6; /* gray-silver y gray-light */
     }
 
+    /* Backdrop blur efecto vidrio */
     .backdrop-blur-glass {
         backdrop-filter: blur(16px) saturate(180%);
         -webkit-backdrop-filter: blur(16px) saturate(180%);
     }
 
+    /* Bordes con degradado */
     .border-gradient {
         border: 1px solid transparent;
         background: linear-gradient(white, white) padding-box,

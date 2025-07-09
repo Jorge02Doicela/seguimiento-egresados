@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rules;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
@@ -33,7 +33,14 @@ class RegisteredUserController extends Controller
                 'max:255',
                 'unique:users,email',
             ],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required',
+                'confirmed',
+                Password::min(8)
+                    ->mixedCase() // al menos una mayúscula y una minúscula
+                    ->numbers()   // al menos un número
+                    ->symbols(),  // al menos un símbolo
+            ],
             'role' => ['required', 'in:graduate,employer'],
             'phone' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:255'],
@@ -67,7 +74,7 @@ class RegisteredUserController extends Controller
             Graduate::create([
                 'user_id' => $user->id,
                 'cohort_year' => now()->year,
-                'gender' => 'Otro',  // o 'M' o 'F' según corresponda
+                'gender' => 'Otro', // puedes cambiar esto por lógica dinámica
                 'company' => null,
                 'position' => null,
                 'salary' => null,
