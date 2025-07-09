@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h1>Editar Perfil</h1>
+    <div class="container mx-auto p-4 md:p-8">
+        <h1 class="text-4xl font-headings text-text-primary mb-6">Editar Perfil</h1>
 
         @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
+            <div class="bg-error-lighter text-error px-4 py-3 rounded-lg mb-6 text-sm" role="alert">
+                <ul class="list-disc list-inside">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -14,128 +14,160 @@
             </div>
         @endif
 
-        <form action="{{ route('graduate.profile.update') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <br>
-            <div class="mb-3">
-                <label class="form-label">¿Está trabajando actualmente?</label>
-                <div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="is_working" id="working_yes" value="1"
-                            {{ old('is_working', $graduate->is_working) ? 'checked' : '' }}>
-                        <label class="form-check-label" for="working_yes">Sí</label>
+        <div class="bg-white shadow-md rounded-2xl p-6 mb-8">
+            <form action="{{ route('graduate.profile.update') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <div class="mb-5">
+                    <label class="block text-sm font-medium text-text-secondary mb-2">¿Está trabajando actualmente?</label>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center">
+                            <input class="form-radio h-4 w-4 text-primary focus:ring-primary border-gray-300" type="radio"
+                                name="is_working" id="working_yes" value="1"
+                                {{ old('is_working', $graduate->is_working) ? 'checked' : '' }}>
+                            <label class="ml-2 text-text-primary" for="working_yes">Sí</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input class="form-radio h-4 w-4 text-primary focus:ring-primary border-gray-300" type="radio"
+                                name="is_working" id="working_no" value="0"
+                                {{ old('is_working', $graduate->is_working) ? '' : 'checked' }}>
+                            <label class="ml-2 text-text-primary" for="working_no">No</label>
+                        </div>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="is_working" id="working_no" value="0"
-                            {{ old('is_working', $graduate->is_working) ? '' : 'checked' }}>
-                        <label class="form-check-label" for="working_no">No</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label for="cohort_year" class="form-label">Año de cohorte de egreso</label>
-                <input type="number" name="cohort_year" id="cohort_year" class="form-control"
-                    value="{{ old('cohort_year', $graduate->cohort_year) }}" required>
-            </div>
-
-            <div class="mb-3">
-                <label for="gender" class="form-label">Género</label>
-                <select name="gender" id="gender" class="form-select" required>
-                    <option value="M" @selected(old('gender', $graduate->gender) == 'M')>Masculino</option>
-                    <option value="F" @selected(old('gender', $graduate->gender) == 'F')>Femenino</option>
-                    <option value="Otro" @selected(old('gender', $graduate->gender) == 'Otro')>Otro</option>
-                </select>
-            </div>
-
-            <div id="workFields">
-                <div class="mb-3">
-                    <label for="company" class="form-label">Empresa</label>
-                    <input type="text" name="company" id="company" class="form-control"
-                        value="{{ old('company', $graduate->company) }}">
                 </div>
 
-                <div class="mb-3">
-                    <label for="position" class="form-label">Cargo</label>
-                    <input type="text" name="position" id="position" class="form-control"
-                        value="{{ old('position', $graduate->position) }}">
+                <div class="mb-5">
+                    <label for="cohort_year" class="block text-sm font-medium text-text-secondary mb-2">Año de cohorte de
+                        egreso</label>
+                    <input type="number" name="cohort_year" id="cohort_year" class="form-input"
+                        value="{{ old('cohort_year', $graduate->cohort_year) }}" required>
                 </div>
 
-                <div class="mb-3">
-                    <label for="salary" class="form-label">Salario</label>
-                    <input type="number" step="0.01" name="salary" id="salary" class="form-control"
-                        value="{{ old('salary', $graduate->salary) }}">
-                </div>
-
-                <div class="mb-3">
-                    <label for="sector" class="form-label">Sector</label>
-                    <select name="sector" id="sector" class="form-select">
-                        <option value="" @selected(old('sector', $graduate->sector) == '')>Seleccione</option>
-                        <option value="privado" @selected(old('sector', $graduate->sector) == 'privado')>Privado</option>
-                        <option value="público" @selected(old('sector', $graduate->sector) == 'público')>Público</option>
-                        <option value="freelance" @selected(old('sector', $graduate->sector) == 'freelance')>Freelance</option>
+                <div class="mb-5">
+                    <label for="gender" class="block text-sm font-medium text-text-secondary mb-2">Género</label>
+                    <select name="gender" id="gender" class="form-select" required>
+                        <option value="M" @selected(old('gender', $graduate->gender) == 'M')>Masculino</option>
+                        <option value="F" @selected(old('gender', $graduate->gender) == 'F')>Femenino</option>
+                        <option value="Otro" @selected(old('gender', $graduate->gender) == 'Otro')>Otro</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="mb-3">
-                <label for="portfolio_url" class="form-label">URL Portafolio</label>
-                <input type="url" name="portfolio_url" id="portfolio_url" class="form-control"
-                    value="{{ old('portfolio_url', $graduate->portfolio_url) }}">
-            </div>
+                <div id="workFields" class="border-t border-border-primary pt-5 mt-5">
+                    <h3 class="text-2xl font-headings text-text-primary mb-4">Detalles Laborales</h3>
+                    <div class="mb-5">
+                        <label for="company" class="block text-sm font-medium text-text-secondary mb-2">Empresa</label>
+                        <input type="text" name="company" id="company" class="form-input"
+                            value="{{ old('company', $graduate->company) }}">
+                    </div>
 
-            <div class="mb-3">
-                <label for="cv" class="form-label">Subir CV (PDF, DOC, DOCX)</label>
-                <input type="file" name="cv" id="cv" class="form-control" accept=".pdf,.doc,.docx">
-                @if ($graduate->cv_path)
-                    <small>Archivo actual: <a href="{{ asset('storage/' . $graduate->cv_path) }}" target="_blank">Ver
-                            CV</a></small>
-                @endif
-            </div>
+                    <div class="mb-5">
+                        <label for="position" class="block text-sm font-medium text-text-secondary mb-2">Cargo</label>
+                        <input type="text" name="position" id="position" class="form-input"
+                            value="{{ old('position', $graduate->position) }}">
+                    </div>
 
-            <div class="mb-3">
-                <label for="country" class="form-label">País</label>
-                <input type="text" name="country" id="country" class="form-control"
-                    value="{{ old('country', $graduate->country) }}">
-            </div>
+                    <div class="mb-5">
+                        <label for="salary" class="block text-sm font-medium text-text-secondary mb-2">Salario</label>
+                        <input type="number" step="0.01" name="salary" id="salary" class="form-input"
+                            value="{{ old('salary', $graduate->salary) }}">
+                    </div>
 
-            <div class="mb-3">
-                <label for="city" class="form-label">Ciudad</label>
-                <input type="text" name="city" id="city" class="form-control"
-                    value="{{ old('city', $graduate->city) }}">
-            </div>
+                    <div class="mb-5">
+                        <label for="sector" class="block text-sm font-medium text-text-secondary mb-2">Sector</label>
+                        <select name="sector" id="sector" class="form-select">
+                            <option value="" @selected(old('sector', $graduate->sector) == '')>Seleccione</option>
+                            <option value="privado" @selected(old('sector', $graduate->sector) == 'privado')>Privado</option>
+                            <option value="público" @selected(old('sector', $graduate->sector) == 'público')>Público</option>
+                            <option value="freelance" @selected(old('sector', $graduate->sector) == 'freelance')>Freelance</option>
+                        </select>
+                    </div>
+                </div>
 
-            <button type="submit" class="btn btn-success">Actualizar Perfil</button>
-        </form>
+                <div class="border-t border-border-primary pt-5 mt-5">
+                    <h3 class="text-2xl font-headings text-text-primary mb-4">Contacto y Documentos</h3>
+                    <div class="mb-5">
+                        <label for="portfolio_url" class="block text-sm font-medium text-text-secondary mb-2">URL
+                            Portafolio</label>
+                        <input type="url" name="portfolio_url" id="portfolio_url" class="form-input"
+                            value="{{ old('portfolio_url', $graduate->portfolio_url) }}">
+                    </div>
 
-        <hr>
+                    <div class="mb-5">
+                        <label for="cv" class="block text-sm font-medium text-text-secondary mb-2">Subir CV (PDF, DOC,
+                            DOCX)</label>
+                        <input type="file" name="cv" id="cv"
+                            class="block w-full text-sm text-text-secondary
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-md file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-primary file:text-white
+                        hover:file:bg-primary-dark cursor-pointer mb-2">
+                        @if ($graduate->cv_path)
+                            <small class="text-text-muted">Archivo actual: <a
+                                    href="{{ asset('storage/' . $graduate->cv_path) }}" target="_blank"
+                                    class="text-primary hover:text-primary-dark">Ver CV</a></small>
+                        @endif
+                    </div>
 
-        <h3>Habilidades</h3>
-        <ul>
-            @foreach ($graduate->skills as $skill)
-                <li>
-                    {{ $skill->name }}
-                    <form action="{{ route('graduate.profile.skills.remove') }}" method="POST" style="display:inline;">
-                        @csrf
-                        <input type="hidden" name="skill_id" value="{{ $skill->id }}">
-                        <button class="btn btn-sm btn-danger" type="submit">Eliminar</button>
-                    </form>
-                </li>
-            @endforeach
-        </ul>
+                    <div class="mb-5">
+                        <label for="country" class="block text-sm font-medium text-text-secondary mb-2">País</label>
+                        <input type="text" name="country" id="country" class="form-input"
+                            value="{{ old('country', $graduate->country) }}">
+                    </div>
 
-        <form action="{{ route('graduate.profile.skills.add') }}" method="POST" class="mt-3">
-            @csrf
-            <select name="skill_id" class="form-select" required>
-                <option value="">Selecciona una habilidad para agregar</option>
-                @foreach ($allSkills as $skill)
-                    @if (!$graduate->skills->contains($skill->id))
-                        <option value="{{ $skill->id }}">{{ $skill->name }}</option>
-                    @endif
-                @endforeach
-            </select>
-            <button class="btn btn-primary mt-2" type="submit">Agregar Habilidad</button>
-        </form>
+                    <div class="mb-5">
+                        <label for="city" class="block text-sm font-medium text-text-secondary mb-2">Ciudad</label>
+                        <input type="text" name="city" id="city" class="form-input"
+                            value="{{ old('city', $graduate->city) }}">
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="btn bg-success text-white hover:bg-green-700 focus:ring-green-500 mt-6">Actualizar
+                    Perfil</button>
+            </form>
+        </div>
+
+        ---
+
+        <div class="bg-white shadow-md rounded-2xl p-6 mb-8">
+            <h3 class="text-2xl font-headings text-text-primary mb-4 border-b border-border-primary pb-2">Habilidades</h3>
+            <ul class="mb-4 space-y-2">
+                @forelse ($graduate->skills as $skill)
+                    <li
+                        class="flex items-center justify-between text-lg text-text-secondary bg-gray-lightest p-3 rounded-lg">
+                        <span>{{ $skill->name }}</span>
+                        <form action="{{ route('graduate.profile.skills.remove') }}" method="POST"
+                            class="inline-block ml-4">
+                            @csrf
+                            <input type="hidden" name="skill_id" value="{{ $skill->id }}">
+                            <button class="btn bg-error text-white hover:bg-error-dark focus:ring-error text-xs px-3 py-1"
+                                type="submit">Eliminar</button>
+                        </form>
+                    </li>
+                @empty
+                    <li class="text-text-muted">No se han registrado habilidades.</li>
+                @endforelse
+            </ul>
+
+            <h4 class="text-xl font-headings text-text-primary mb-3">Agregar Nueva Habilidad</h4>
+            <form action="{{ route('graduate.profile.skills.add') }}" method="POST"
+                class="flex flex-col sm:flex-row items-start sm:items-end gap-3">
+                @csrf
+                <div class="flex-grow w-full sm:w-auto">
+                    <label for="add_skill_id" class="sr-only">Selecciona una habilidad para agregar</label>
+                    <select name="skill_id" id="add_skill_id" class="form-select w-full" required>
+                        <option value="">Selecciona una habilidad para agregar</option>
+                        @foreach ($allSkills as $skill)
+                            @if (!$graduate->skills->contains($skill->id))
+                                <option value="{{ $skill->id }}">{{ $skill->name }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
+                <button class="btn btn-primary w-full sm:w-auto" type="submit">Agregar Habilidad</button>
+            </form>
+        </div>
     </div>
 @endsection
 
@@ -157,7 +189,7 @@
             workingYes.addEventListener('change', toggleWorkFields);
             workingNo.addEventListener('change', toggleWorkFields);
 
-            toggleWorkFields(); // Estado inicial
+            toggleWorkFields(); // Set initial state based on current value
         });
     </script>
 @endsection

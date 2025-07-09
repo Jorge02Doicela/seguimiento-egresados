@@ -1,55 +1,98 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h1>Perfil de Egresado</h1>
+    <div class="container mx-auto p-4 md:p-8">
+        <h1 class="text-4xl font-headings text-text-primary mb-6">Perfil de Egresado</h1>
 
         @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="bg-success-lighter text-success-dark px-4 py-3 rounded-lg mb-4 text-sm" role="alert">
+                {{ session('success') }}
+            </div>
         @endif
 
-        <p><strong>Año de cohorte de egreso:</strong> {{ $graduate->cohort_year }}</p>
-        <p><strong>Género:</strong> {{ $graduate->gender }}</p>
+        <div class="bg-white shadow-md rounded-2xl p-6 mb-8">
+            <h3 class="text-2xl font-headings text-text-primary mb-4 border-b border-border-primary pb-2">Información General
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-lg">
+                <p><strong>Año de cohorte de egreso:</strong> <span
+                        class="text-text-secondary">{{ $graduate->cohort_year }}</span></p>
+                <p><strong>Género:</strong> <span class="text-text-secondary">{{ $graduate->gender }}</span></p>
+                <p><strong>¿Está trabajando actualmente?</strong>
+                    <span class="font-semibold {{ $graduate->is_working ? 'text-success' : 'text-error' }}">
+                        {{ $graduate->is_working ? 'Sí' : 'No' }}
+                    </span>
+                </p>
+            </div>
 
-        <p><strong>¿Está trabajando actualmente?</strong>
-            {{ $graduate->is_working ? 'Sí' : 'No' }}
-        </p>
-
-        @if ($graduate->is_working)
-            <p><strong>Empresa:</strong> {{ $graduate->company ?? 'No registrado' }}</p>
-            <p><strong>Cargo:</strong> {{ $graduate->position ?? 'No registrado' }}</p>
-            <p><strong>Salario:</strong> {{ $graduate->salary ?? 'No registrado' }}</p>
-            <p><strong>Sector:</strong> {{ $graduate->sector ?? 'No registrado' }}</p>
-        @endif
-
-        <p><strong>Portafolio:</strong>
-            @if ($graduate->portfolio_url)
-                <a href="{{ $graduate->portfolio_url }}" target="_blank">Ver portafolio</a>
-            @else
-                No registrado
+            @if ($graduate->is_working)
+                <h3 class="text-2xl font-headings text-text-primary mt-6 mb-4 border-b border-border-primary pb-2">Detalles
+                    Laborales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-lg">
+                    <p><strong>Empresa:</strong> <span
+                            class="text-text-secondary">{{ $graduate->company ?? 'No registrado' }}</span></p>
+                    <p><strong>Cargo:</strong> <span
+                            class="text-text-secondary">{{ $graduate->position ?? 'No registrado' }}</span></p>
+                    <p><strong>Salario:</strong> <span
+                            class="text-text-secondary">{{ $graduate->salary ?? 'No registrado' }}</span></p>
+                    <p><strong>Sector:</strong>
+                        @if ($graduate->sector)
+                            @php
+                                $sectorBadgeClass = '';
+                                if ($graduate->sector === 'privado') {
+                                    $sectorBadgeClass = 'badge-success';
+                                } elseif ($graduate->sector === 'público') {
+                                    $sectorBadgeClass = 'bg-primary-lightest text-primary'; // Using primary colors for public
+                                } elseif ($graduate->sector === 'freelance') {
+                                    $sectorBadgeClass = 'badge-warning';
+                                }
+                            @endphp
+                            <span class="badge {{ $sectorBadgeClass }}">{{ $graduate->sector }}</span>
+                        @else
+                            <span class="text-text-muted">No registrado</span>
+                        @endif
+                    </p>
+                </div>
             @endif
-        </p>
 
-        <p><strong>CV:</strong>
-            @if ($graduate->cv_path)
-                <a href="{{ asset('storage/' . $graduate->cv_path) }}" target="_blank">Ver CV</a>
-            @else
-                No registrado
-            @endif
-        </p>
+            <h3 class="text-2xl font-headings text-text-primary mt-6 mb-4 border-b border-border-primary pb-2">Contacto y
+                Documentos</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-lg">
+                <p><strong>Portafolio:</strong>
+                    @if ($graduate->portfolio_url)
+                        <a href="{{ $graduate->portfolio_url }}" target="_blank"
+                            class="text-primary hover:text-primary-dark transition-colors duration-300">Ver portafolio</a>
+                    @else
+                        <span class="text-text-muted">No registrado</span>
+                    @endif
+                </p>
+                <p><strong>CV:</strong>
+                    @if ($graduate->cv_path)
+                        <a href="{{ asset('storage/' . $graduate->cv_path) }}" target="_blank"
+                            class="text-primary hover:text-primary-dark transition-colors duration-300">Ver CV</a>
+                    @else
+                        <span class="text-text-muted">No registrado</span>
+                    @endif
+                </p>
+                <p><strong>País:</strong> <span
+                        class="text-text-secondary">{{ $graduate->country ?? 'No registrado' }}</span></p>
+                <p><strong>Ciudad:</strong> <span
+                        class="text-text-secondary">{{ $graduate->city ?? 'No registrado' }}</span></p>
+            </div>
+        </div>
 
-        <p><strong>País:</strong> {{ $graduate->country ?? 'No registrado' }}</p>
-        <p><strong>Ciudad:</strong> {{ $graduate->city ?? 'No registrado' }}</p>
+        <div class="bg-white shadow-md rounded-2xl p-6 mb-8">
+            <h3 class="text-2xl font-headings text-text-primary mb-4 border-b border-border-primary pb-2">Habilidades</h3>
+            <ul class="list-disc list-inside text-lg text-text-secondary">
+                @forelse($graduate->skills as $skill)
+                    <li class="mb-1">{{ $skill->name }}</li>
+                @empty
+                    <li class="text-text-muted">No se han registrado habilidades.</li>
+                @endforelse
+            </ul>
+        </div>
 
-        <h3>Habilidades</h3>
-        <ul>
-            @forelse($graduate->skills as $skill)
-                <li>{{ $skill->name }}</li>
-            @empty
-                <li>No se han registrado habilidades.</li>
-            @endforelse
-        </ul>
-
-        <a href="{{ route('graduate.profile.edit') }}" class="btn btn-primary">Editar Perfil</a>
+        <div class="flex justify-start">
+            <a href="{{ route('graduate.profile.edit') }}" class="btn btn-primary">Editar Perfil</a>
+        </div>
     </div>
 @endsection

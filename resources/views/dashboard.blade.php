@@ -76,25 +76,22 @@
                         class="text-center mb-12 text-primary font-headings text-4xl lg:text-5xl font-extrabold animate-fade-in-down">
                         Bienvenido, Egresado</h1>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-16 justify-items-center">
+
                         {{-- Tarjeta de Actualización de Perfil --}}
                         <div class="w-full">
                             <div
                                 class="card h-full flex flex-col overflow-hidden animate-slide-in-left border border-primary-lightest">
-                                {{-- Aplicado .card, Borde sutil añadido --}}
                                 <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80"
                                     class="w-full h-64 object-cover rounded-t-2xl" alt="Perfil Profesional">
                                 <div class="p-7 flex flex-col flex-grow">
-                                    <h5 class="text-text-primary font-headings font-bold text-2xl mb-4"><i
-                                            class="bi bi-person-badge-fill mr-3 text-secondary"></i>Actualización de Perfil</h5>
-                                    {{-- Aplicado text-text-primary --}}
+                                    <h5 class="text-text-primary font-headings font-bold text-2xl mb-4">
+                                        <i class="bi bi-person-badge-fill mr-3 text-secondary"></i>
+                                        Actualización de Perfil
+                                    </h5>
                                     <p class="text-text-light font-body text-base flex-grow leading-relaxed">
-                                        {{-- Aplicado font-body --}}
                                         Mantenga su información actualizada: empresa, cargo, salario y habilidades técnicas que
                                         reflejan su valiosa trayectoria laboral.
                                     </p>
-                                    <a href="#" class="btn btn-primary mt-6"> {{-- Aplicado .btn .btn-primary --}}
-                                        Editar Perfil <i class="bi bi-pencil-square ml-2"></i>
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -103,21 +100,17 @@
                         <div class="w-full">
                             <div
                                 class="card h-full flex flex-col overflow-hidden animate-slide-in-right delay-100 border border-primary-lightest">
-                                {{-- Aplicado .card, Borde sutil añadido --}}
                                 <img src="https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80"
                                     class="w-full h-64 object-cover rounded-t-2xl" alt="Encuestas">
                                 <div class="p-7 flex flex-col flex-grow">
-                                    <h5 class="text-text-primary font-headings font-bold text-2xl mb-4"><i
-                                            class="bi bi-clipboard-check-fill mr-3 text-secondary"></i>Participación en
-                                        Encuestas</h5> {{-- Aplicado text-text-primary --}}
+                                    <h5 class="text-text-primary font-headings font-bold text-2xl mb-4">
+                                        <i class="bi bi-clipboard-check-fill mr-3 text-secondary"></i>
+                                        Participación en Encuestas
+                                    </h5>
                                     <p class="text-text-light font-body text-base flex-grow leading-relaxed">
-                                        {{-- Aplicado font-body --}}
                                         Su participación es crucial para la mejora continua de la formación y la relevancia del
                                         programa académico que lo vio crecer.
                                     </p>
-                                    <a href="#" class="btn btn-accent mt-6"> {{-- Aplicado .btn .btn-accent --}}
-                                        Realizar Encuesta <i class="bi bi-question-circle ml-2"></i>
-                                    </a>
                                 </div>
                             </div>
                         </div>
@@ -140,9 +133,6 @@
                                 Visualice información agregada crucial sobre empleabilidad, sectores predominantes y tendencias
                                 salariales para apoyar la valiosa colaboración entre el sector productivo y el Instituto Sucre.
                             </p>
-                            <a href="#" class="btn btn-primary mt-8"> {{-- Aplicado .btn .btn-primary --}}
-                                Explorar Datos <i class="bi bi-bar-chart-fill ml-3"></i>
-                            </a>
                         </div>
                     </div>
                 @else

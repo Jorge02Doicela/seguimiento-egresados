@@ -15,6 +15,7 @@
 
 <body class="font-body antialiased bg-bg-primary text-text-primary min-h-screen flex flex-col">
 
+    {{-- Barra de notificación si hay encuestas nuevas --}}
     @auth
         @if (auth()->user()->hasRole('graduate'))
             @php
@@ -27,7 +28,6 @@
             @endphp
 
             @if ($unreadSurveyCount > 0)
-                {{-- Notification bar for unread surveys --}}
                 <div
                     class="bg-warning text-text-inverse p-3 text-center text-sm font-semibold sticky top-0 z-sticky shadow-md">
                     Tienes <span class="font-bold">{{ $unreadSurveyCount }}</span> notificación(es) nueva(s).
@@ -53,8 +53,9 @@
                 </svg>
             </button>
 
-            {{-- Navigation links (desktop and toggled mobile) --}}
+            {{-- Navigation links --}}
             <div class="hidden w-full lg:flex lg:w-auto lg:items-center z-dropdown" id="navbarSupportedContent">
+
                 @auth
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 w-full lg:w-auto">
                         <li class="mb-2 lg:mb-0">
@@ -91,15 +92,8 @@
                         @endrole
                     </ul>
 
-                    {{-- User-specific links and logout --}}
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 lg:ml-auto">
-                        {{-- Link común a perfil para todos los roles --}}
-                        <li class="mb-2 lg:mb-0">
-                            <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                href="{{ route('profile.edit') }}">Perfil</a>
-                        </li>
-
-                        {{-- Opcional links adicionales por rol --}}
+                        {{-- Enlaces opcionales por rol --}}
                         @role('graduate')
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
@@ -107,13 +101,13 @@
                             </li>
                         @endrole
 
-                        @role('employer')
-                            <li class="mb-2 lg:mb-0">
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="#">Perfil Empleador</a>
-                            </li>
-                        @endrole
+                        {{-- Perfil general justo antes del botón de cerrar sesión --}}
+                        <li class="mb-2 lg:mb-0">
+                            <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                href="{{ route('profile.edit') }}">Perfil</a>
+                        </li>
 
+                        {{-- Botón de cerrar sesión --}}
                         <li class="mb-2 lg:mb-0">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -125,7 +119,7 @@
                         </li>
                     </ul>
                 @else
-                    {{-- Guest navigation links --}}
+                    {{-- Navegación para visitantes --}}
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 lg:ml-auto">
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
@@ -137,16 +131,17 @@
                         </li>
                     </ul>
                 @endauth
+
             </div>
         </div>
     </nav>
 
-    {{-- Main content area --}}
+    {{-- Main content --}}
     <main class="container mx-auto px-4 mt-8 mb-12 flex-grow">
         @yield('content')
     </main>
 
-    {{-- Footer section --}}
+    {{-- Footer --}}
     <footer class="bg-gray-carbon text-text-inverse py-8 mt-auto">
         <div class="container mx-auto px-4 text-center">
             <p>&copy; {{ date('Y') }} Instituto Superior Universitario Tecnológico Sucre.</p>
@@ -154,7 +149,7 @@
         </div>
     </footer>
 
-    {{-- JavaScript for mobile navigation toggle --}}
+    {{-- JS para navegación móvil --}}
     <script>
         document.getElementById('navbar-toggle').addEventListener('click', function() {
             const navContent = document.getElementById('navbarSupportedContent');
@@ -162,12 +157,12 @@
         });
     </script>
 
-    {{-- Detectar inactividad y cerrar sesión con modal de aviso --}}
+    {{-- Auto logout por inactividad --}}
     @auth
         <script>
             (function() {
-                const TIEMPO_INACTIVIDAD_TOTAL = 20 * 60 * 1000; // 20 minutos
-                const TIEMPO_AVISO = 1 * 60 * 1000; // 1 minuto antes para aviso
+                const TIEMPO_INACTIVIDAD_TOTAL = 20 * 60 * 1000;
+                const TIEMPO_AVISO = 1 * 60 * 1000;
 
                 let timeoutCerrarSesion;
                 let timeoutMostrarAviso;
@@ -221,9 +216,7 @@
                             body: JSON.stringify({})
                         })
                         .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Error en el cierre de sesión');
-                            }
+                            if (!response.ok) throw new Error('Error en el cierre de sesión');
                             window.location.href = "{{ route('login') }}";
                         })
                         .catch(error => {
@@ -237,18 +230,13 @@
                     clearTimeout(timeoutCerrarSesion);
                     clearTimeout(timeoutMostrarAviso);
 
-                    timeoutMostrarAviso = setTimeout(() => {
-                        crearModalAviso();
-                    }, TIEMPO_INACTIVIDAD_TOTAL - TIEMPO_AVISO);
-
-                    timeoutCerrarSesion = setTimeout(() => {
-                        cerrarSesion();
-                    }, TIEMPO_INACTIVIDAD_TOTAL);
+                    timeoutMostrarAviso = setTimeout(() => crearModalAviso(), TIEMPO_INACTIVIDAD_TOTAL - TIEMPO_AVISO);
+                    timeoutCerrarSesion = setTimeout(() => cerrarSesion(), TIEMPO_INACTIVIDAD_TOTAL);
                 }
 
-                ['mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evento => {
-                    window.addEventListener(evento, resetTimeout, true);
-                });
+                ['mousemove', 'keydown', 'scroll', 'touchstart'].forEach(evento =>
+                    window.addEventListener(evento, resetTimeout, true)
+                );
 
                 resetTimeout();
             })
@@ -256,7 +244,7 @@
         </script>
     @endauth
 
-    @yield('scripts') {{-- Include additional view-specific scripts --}}
+    @yield('scripts')
 </body>
 
 </html>
