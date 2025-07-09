@@ -57,9 +57,7 @@
         <div class="form-check mb-3">
             <input class="form-check-input" type="checkbox" name="is_active" id="is_active" value="1"
                 {{ old('is_active') ? 'checked' : '' }}>
-            <label class="form-check-label" for="is_active">
-                Activa
-            </label>
+            <label class="form-check-label" for="is_active">Activa</label>
         </div>
 
         <hr>
@@ -67,12 +65,14 @@
         <h3>Preguntas</h3>
 
         <div id="questionsContainer">
-            {{-- Preguntas agregadas dinámicamente --}}
+            {{-- Aquí se agregarán preguntas dinámicamente --}}
         </div>
 
         <button type="button" class="btn btn-outline-primary mb-3" id="addQuestionBtn">Agregar Pregunta</button>
 
         <button type="submit" class="btn btn-success">Guardar Encuesta</button>
+
+        <pre id="formDebug" style="background:#eee; padding:10px; max-height:300px; overflow:auto; white-space: pre-wrap;"></pre>
     </form>
 
     {{-- Plantilla de pregunta oculta para clonar --}}
@@ -84,7 +84,8 @@
 
                 <div class="mb-3">
                     <label class="form-label">Texto de la pregunta <span class="text-danger">*</span></label>
-                    <input type="text" name="questions[__INDEX__][question_text]" class="form-control" required>
+                    <input type="text" name="questions[__INDEX__][question_text]" class="form-control question-text"
+                        required>
                 </div>
 
                 <div class="mb-3">
@@ -108,13 +109,13 @@
                 <div class="row scale-container" style="display:none;">
                     <div class="col">
                         <label class="form-label">Valor mínimo</label>
-                        <input type="number" name="questions[__INDEX__][scale_min]" class="form-control" value="1"
-                            readonly>
+                        <input type="number" name="questions[__INDEX__][scale_min]"
+                            class="form-control question-scale-min" value="1" readonly>
                     </div>
                     <div class="col">
                         <label class="form-label">Valor máximo</label>
-                        <input type="number" name="questions[__INDEX__][scale_max]" class="form-control" value="5"
-                            readonly>
+                        <input type="number" name="questions[__INDEX__][scale_max]"
+                            class="form-control question-scale-max" value="5" readonly>
                     </div>
                 </div>
             </div>
@@ -127,7 +128,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const questionsContainer = document.getElementById('questionsContainer');
             const addQuestionBtn = document.getElementById('addQuestionBtn');
-            const questionTemplate = document.getElementById('questionTemplate').content;
+            const questionTemplate = document.getElementById('questionTemplate').innerHTML;
 
             let questionIndex = 0;
 
@@ -155,60 +156,57 @@
                 return div;
             }
 
-            function toggleOptionsAndScale(questionCard, qIndex) {
-                const typeSelect = questionCard.querySelector('.question-type');
-                const optionsContainer = questionCard.querySelector('.options-container');
-                const scaleContainer = questionCard.querySelector('.scale-container');
-                const optionsList = questionCard.querySelector('.options-list');
+            function addQuestion() {
+                let html = questionTemplate.replace(/__INDEX__/g, questionIndex);
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html.trim();
 
-                function setRequiredForOptions(required) {
-                    optionsList.querySelectorAll('input').forEach(input => input.required = required);
-                }
+                // Cambiado a querySelector para evitar que firstChild sea un nodo texto
+                const questionCard = tempDiv.querySelector('.question-item');
+                questionsContainer.appendChild(questionCard);
 
                 const addOptionBtn = questionCard.querySelector('.add-option-btn');
+                const optionsList = questionCard.querySelector('.options-list');
+                const typeSelect = questionCard.querySelector('.question-type');
+
                 addOptionBtn.addEventListener('click', () => {
-                    const optionInput = createOptionInput(qIndex);
+                    const optionInput = createOptionInput(questionIndex);
                     optionsList.appendChild(optionInput);
                 });
 
+                // Mostrar/ocultar opciones o escala según tipo
                 typeSelect.addEventListener('change', () => {
                     const val = typeSelect.value;
+                    const optionsContainer = questionCard.querySelector('.options-container');
+                    const scaleContainer = questionCard.querySelector('.scale-container');
+
                     if (val === 'option' || val === 'checkbox') {
                         optionsContainer.style.display = 'block';
                         scaleContainer.style.display = 'none';
-                        setRequiredForOptions(true);
+
+                        optionsList.querySelectorAll('input').forEach(i => i.required = true);
+
                         if (optionsList.children.length === 0) {
                             addOptionBtn.click();
                         }
                     } else if (val === 'scale') {
                         optionsContainer.style.display = 'none';
                         scaleContainer.style.display = 'flex';
-                        setRequiredForOptions(false);
+
+                        optionsList.querySelectorAll('input').forEach(i => i.required = false);
                     } else {
                         optionsContainer.style.display = 'none';
                         scaleContainer.style.display = 'none';
-                        setRequiredForOptions(false);
+
+                        optionsList.querySelectorAll('input').forEach(i => i.required = false);
                     }
                 });
 
                 typeSelect.dispatchEvent(new Event('change'));
-            }
 
-            function addQuestion() {
-                const clone = document.importNode(questionTemplate, true);
-                const questionCard = clone.querySelector('.question-item');
-
-                questionCard.querySelector('.question-text').name = `questions[${questionIndex}][question_text]`;
-                questionCard.querySelector('.question-type').name = `questions[${questionIndex}][type]`;
-                questionCard.querySelector('.question-scale-min').name = `questions[${questionIndex}][scale_min]`;
-                questionCard.querySelector('.question-scale-max').name = `questions[${questionIndex}][scale_max]`;
-
-                questionsContainer.appendChild(clone);
-                const addedCard = questionsContainer.lastElementChild;
-
-                toggleOptionsAndScale(addedCard, questionIndex);
-
-                addedCard.querySelector('.remove-question-btn').addEventListener('click', () => addedCard.remove());
+                questionCard.querySelector('.remove-question-btn').addEventListener('click', () => {
+                    questionCard.remove();
+                });
 
                 questionIndex++;
             }
@@ -218,6 +216,60 @@
             if (questionsContainer.children.length === 0) {
                 addQuestion();
             }
+
+            // Validación personalizada antes de enviar
+            const surveyForm = document.getElementById('surveyForm');
+
+            surveyForm.addEventListener('submit', function(e) {
+                // Limpiar errores previos
+                const questionItems = surveyForm.querySelectorAll('.question-item');
+                questionItems.forEach(item => {
+                    item.querySelectorAll('.form-control, .form-select').forEach(input => {
+                        input.classList.remove('is-invalid');
+                    });
+                });
+
+                let isValid = true;
+
+                questionItems.forEach((questionCard, index) => {
+                    const questionText = questionCard.querySelector(
+                        'input[name^="questions"][name$="[question_text]"]');
+                    const questionType = questionCard.querySelector(
+                        'select[name^="questions"][name$="[type]"]');
+
+                    if (!questionText.value.trim()) {
+                        questionText.classList.add('is-invalid');
+                        isValid = false;
+                    }
+                    if (!questionType.value) {
+                        questionType.classList.add('is-invalid');
+                        isValid = false;
+                    }
+
+                    // Si tipo es opción múltiple o checkbox, validar que tenga al menos una opción no vacía
+                    if (['option', 'checkbox'].includes(questionType.value)) {
+                        const optionInputs = questionCard.querySelectorAll('.options-list input');
+                        let hasValidOption = false;
+                        optionInputs.forEach(optInput => {
+                            if (optInput.value.trim()) {
+                                hasValidOption = true;
+                                optInput.classList.remove('is-invalid');
+                            } else {
+                                optInput.classList.add('is-invalid');
+                            }
+                        });
+                        if (!hasValidOption) {
+                            isValid = false;
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    alert(
+                        'Por favor completa todos los campos requeridos en las preguntas antes de guardar.');
+                }
+            });
         });
     </script>
 @endsection

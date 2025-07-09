@@ -200,6 +200,7 @@
             const container = document.getElementById('questionsContainer');
             const template = document.getElementById('questionTemplate');
             const addBtn = document.getElementById('addQuestionBtn');
+            const form = document.getElementById('surveyForm');
 
             // Detectar el índice más alto usado en preguntas existentes
             let lastIndex = -1;
@@ -280,6 +281,15 @@
 
             // Inicializar eventos en preguntas existentes
             container.querySelectorAll('.question-item').forEach(attachEventsToCard);
+
+            // Validar que haya al menos una pregunta antes de enviar el formulario
+            form.addEventListener('submit', function(event) {
+                const questionsCount = container.querySelectorAll('.question-item').length;
+                if (questionsCount === 0) {
+                    event.preventDefault();
+                    alert('La encuesta debe tener al menos una pregunta.');
+                }
+            });
         });
     </script>
 @endsection

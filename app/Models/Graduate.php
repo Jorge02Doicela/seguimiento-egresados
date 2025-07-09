@@ -13,6 +13,7 @@ class Graduate extends Model
         'user_id',
         'cohort_year',
         'gender',
+        'is_working',
         'company',
         'position',
         'salary',

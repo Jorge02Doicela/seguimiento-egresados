@@ -100,7 +100,7 @@
                         <li class="mb-2 lg:mb-0">
                             @if (auth()->user()->hasRole('graduate'))
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('graduate.profile.edit') }}">Perfil</a>
+                                    href="{{ route('graduate.profile.show') }}">Perfil</a>
                             @elseif(auth()->user()->hasRole('admin'))
                                 {{-- Admin profile link can be added here if needed --}}
                             @elseif(auth()->user()->hasRole('employer'))

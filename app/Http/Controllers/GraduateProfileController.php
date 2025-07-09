@@ -46,6 +46,7 @@ class GraduateProfileController extends Controller
         $validated = $request->validate([
             'cohort_year' => 'required|integer|min:1900|max:' . date('Y'),
             'gender' => 'required|in:M,F,Otro',
+            'is_working' => 'required|boolean',
             'company' => 'nullable|string|max:255',
             'position' => 'nullable|string|max:255',
             'salary' => 'nullable|numeric|min:0',
