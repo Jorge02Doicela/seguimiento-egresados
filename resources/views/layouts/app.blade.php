@@ -93,17 +93,27 @@
 
                     {{-- User-specific links and logout --}}
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 lg:ml-auto">
+                        {{-- Link común a perfil para todos los roles --}}
                         <li class="mb-2 lg:mb-0">
-                            @if (auth()->user()->hasRole('graduate'))
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('graduate.profile.show') }}">Perfil</a>
-                            @elseif(auth()->user()->hasRole('admin'))
-                                {{-- Admin profile link can be added here if needed --}}
-                            @elseif(auth()->user()->hasRole('employer'))
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="#">Perfil empleador</a>
-                            @endif
+                            <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                href="{{ route('profile.edit') }}">Perfil</a>
                         </li>
+
+                        {{-- Opcional links adicionales por rol --}}
+                        @role('graduate')
+                            <li class="mb-2 lg:mb-0">
+                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                    href="{{ route('graduate.profile.show') }}">Perfil Egresado</a>
+                            </li>
+                        @endrole
+
+                        @role('employer')
+                            <li class="mb-2 lg:mb-0">
+                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                    href="#">Perfil Empleador</a>
+                            </li>
+                        @endrole
+
                         <li class="mb-2 lg:mb-0">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
