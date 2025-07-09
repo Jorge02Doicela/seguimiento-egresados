@@ -25,6 +25,9 @@ class NotificationController extends Controller
     {
         $user = Auth::user();
 
+        // Sanitizar ID: convertir a entero para blindar aún más
+        $id = (int) $id;
+
         $notification = $user->notifications()->findOrFail($id);
 
         if (!$notification->read_at) {

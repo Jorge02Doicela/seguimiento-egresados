@@ -75,10 +75,6 @@
                         @role('graduate')
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('graduate.home') }}">Egresado</a>
-                            </li>
-                            <li class="mb-2 lg:mb-0">
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('graduate.surveys.index') }}">Responder Encuestas</a>
                             </li>
                         @endrole

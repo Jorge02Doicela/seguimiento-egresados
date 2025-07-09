@@ -52,13 +52,20 @@ class MessageController extends Controller
     }
 
     // Marcar un mensaje como leído
+    // Marcar un mensaje como leído
     public function markAsRead($id)
     {
         $user = Auth::user();
+
+        // Convertir $id a entero para blindar contra inyección y errores
+        $id = (int) $id;
+
+        // Buscar el mensaje asegurando que pertenece al usuario autenticado
         $message = Message::where('id', $id)
             ->where('receiver_id', $user->id)
             ->firstOrFail();
 
+        // Marcar como leído si aún no lo está
         if (!$message->read) {
             $message->read = true;
             $message->save();

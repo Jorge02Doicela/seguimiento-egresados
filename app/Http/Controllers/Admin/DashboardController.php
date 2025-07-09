@@ -12,14 +12,22 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Recoger filtros de la request
-        $yearFrom = $request->input('year_from');
-        $yearTo = $request->input('year_to');
-        $sector = $request->input('sector');
-        $gender = $request->input('gender');
-        $position = $request->input('position');
+        // ✅ Validación segura de filtros
+        $validated = $request->validate([
+            'year_from' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'year_to' => 'nullable|integer|min:1900|max:' . date('Y'),
+            'sector' => 'nullable|in:privado,público,freelance',
+            'gender' => 'nullable|in:M,F,Otro',
+            'position' => 'nullable|string|max:100',
+        ]);
 
-        // Base query para egresados, para filtrar en múltiples consultas
+        $yearFrom = $validated['year_from'] ?? null;
+        $yearTo = $validated['year_to'] ?? null;
+        $sector = $validated['sector'] ?? null;
+        $gender = $validated['gender'] ?? null;
+        $position = $validated['position'] ?? null;
+
+        // Base query para egresados
         $graduatesQuery = Graduate::query();
 
         if ($yearFrom) {
@@ -35,7 +43,7 @@ class DashboardController extends Controller
             $graduatesQuery->where('gender', $gender);
         }
         if ($position) {
-            $graduatesQuery->where('position', 'like', "%{$position}%");
+            $graduatesQuery->where('position', 'like', '%' . addcslashes($position, '%_') . '%');
         }
 
         // Empleabilidad por cohorte
@@ -79,7 +87,6 @@ class DashboardController extends Controller
             ->get();
 
         // Habilidades más frecuentes (top 5)
-        // Para filtrar habilidades, debemos hacer join con graduates y aplicar filtros
         $skillQuery = DB::table('graduate_skill')
             ->join('skills', 'skills.id', '=', 'graduate_skill.skill_id')
             ->join('graduates', 'graduates.id', '=', 'graduate_skill.graduate_id');
@@ -97,7 +104,7 @@ class DashboardController extends Controller
             $skillQuery->where('graduates.gender', $gender);
         }
         if ($position) {
-            $skillQuery->where('graduates.position', 'like', "%{$position}%");
+            $skillQuery->where('graduates.position', 'like', '%' . addcslashes($position, '%_') . '%');
         }
 
         $skillData = $skillQuery
@@ -121,14 +128,13 @@ class DashboardController extends Controller
         $withCV = (clone $graduatesQuery)->whereNotNull('cv_path')->count();
 
         // Participación en encuestas
-        // NOTA: aquí 'user_id' es el id del egresado en tabla answers, revisa si es correcto según tu DB
         $totalGraduates = (clone $graduatesQuery)->count();
         $graduatesWithAnswers = Answer::distinct('user_id')->count('user_id');
         $surveyParticipationRate = $totalGraduates > 0
             ? round(($graduatesWithAnswers / $totalGraduates) * 100, 2)
             : 0;
 
-        // Notificaciones
+        // Notificaciones no leídas
         $unreadNotifications = auth()->user()->unreadNotifications;
 
         return view('admin.dashboard.index', compact(

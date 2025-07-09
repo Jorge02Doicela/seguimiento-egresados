@@ -57,14 +57,24 @@ class SurveyDashboardController extends Controller
     // Exportar Excel
     public function exportExcel(Request $request)
     {
-        $filters = $request->only(['survey_id', 'career_id', 'cohort_year']);
+        $request->validate([
+            'survey_id' => 'nullable|exists:surveys,id',
+            'career_id' => 'nullable|exists:careers,id',
+            'cohort_year' => 'nullable|integer|min:1900|max:' . date('Y'),
+        ]);
+
         return Excel::download(new SurveyReportExport($filters), 'survey_report.xlsx');
     }
 
     // Exportar PDF
     public function exportPDF(Request $request)
     {
-        $filters = $request->only(['survey_id', 'career_id', 'cohort_year']);
+        $request->validate([
+            'survey_id' => 'nullable|exists:surveys,id',
+            'career_id' => 'nullable|exists:careers,id',
+            'cohort_year' => 'nullable|integer|min:1900|max:' . date('Y'),
+        ]);
+
 
         $query = Answer::query()
             ->select(
