@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\DashboardExportController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SurveyDashboardController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,7 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Rutas exclusivas Admin con CRUD completo para encuestas y dashboards
+// Rutas exclusivas Admin con CRUD completo para encuestas, dashboards y usuarios
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard principal admin
@@ -51,7 +52,18 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // CRUD completo encuestas
     Route::resource('surveys', SurveyController::class);
+
+    // Exportar dashboard
+    Route::get('/dashboard/export/excel', [DashboardExportController::class, 'exportExcel'])->name('dashboard.export.excel');
+    Route::get('/dashboard/export/pdf', [DashboardExportController::class, 'exportPDF'])->name('dashboard.export.pdf');
+
+    // Gestión de usuarios (simplificado con resource)
+    Route::resource('users', UserController::class);
+
+    // Otras rutas...
+    Route::patch('users/{user}/toggle-block', [UserController::class, 'toggleBlock'])->name('users.toggle-block');
 });
+
 
 // Rutas exclusivas Egresados (graduate)
 Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate.')->group(function () {
@@ -86,20 +98,18 @@ Route::middleware(['auth', 'role:employer'])->prefix('employer')->name('employer
 // Rutas para mensajes y notificaciones (usuarios autenticados)
 Route::middleware(['auth'])->group(function () {
     // Mensajes
-    Route::get('messages', [MessageController::class, 'index'])->name('messages.index');
-    Route::get('messages/create', [MessageController::class, 'create'])->name('messages.create');
-    Route::post('messages', [MessageController::class, 'store'])->name('messages.store');
-    Route::post('messages/{id}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+    Route::get('/messages', [MessageController::class, 'inbox'])->name('messages.inbox');
+    Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
+    Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/messages/sent', [MessageController::class, 'sent'])->name('messages.sent');
+    Route::get('/messages/{id}', [MessageController::class, 'show'])->name('messages.show');
+    Route::post('/messages/{id}/read', [MessageController::class, 'markAsRead'])->name('messages.read');
+    Route::get('/messages/attachment/{id}', [MessageController::class, 'attachment'])->name('messages.attachment');
+    Route::delete('/messages/{id}', [MessageController::class, 'destroy'])->name('messages.destroy');
 
     // Notificaciones
-    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
-});
-
-// Rutas para exportar datos del dashboard general admin
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
-    Route::get('/dashboard/export/excel', [DashboardExportController::class, 'exportExcel'])->name('admin.dashboard.export.excel');
-    Route::get('/dashboard/export/pdf', [DashboardExportController::class, 'exportPDF'])->name('admin.dashboard.export.pdf');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 require __DIR__ . '/auth.php';

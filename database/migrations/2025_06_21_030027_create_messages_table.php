@@ -11,9 +11,10 @@ class CreateMessagesTable extends Migration
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('receiver_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('recipient_id')->constrained('users')->onDelete('cascade');
             $table->text('content');
-            $table->boolean('read')->default(false);
+            $table->string('attachment_path')->nullable();
+            $table->timestamp('read_at')->nullable(); // indica cuándo fue leído, null si no leído
             $table->timestamps();
         });
     }

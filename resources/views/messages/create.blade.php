@@ -1,35 +1,74 @@
 @extends('layouts.app')
 
+@section('title', 'Nuevo Mensaje')
+
 @section('content')
-<div class="container mt-4">
-    <h2>Enviar Mensaje</h2>
+    <div class="container py-4">
+        <h1 class="mb-4">Enviar Nuevo Mensaje</h1>
 
-    <form action="{{ route('messages.store') }}" method="POST">
-        @csrf
-        <div class="mb-3">
-            <label for="receiver_id" class="form-label">Para</label>
-            <select name="receiver_id" id="receiver_id" class="form-select" required>
-                <option value="">Selecciona un usuario</option>
-                @foreach($users as $user)
-                    <option value="{{ $user->id }}" {{ old('receiver_id') == $user->id ? 'selected' : '' }}>
-                        {{ $user->name }} ({{ $user->email }})
-                    </option>
-                @endforeach
-            </select>
-            @error('receiver_id')
-                <small class="text-danger">{{ $message }}</small>
-            @enderror
-        </div>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <strong>Hay errores en el formulario:</strong>
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-        <div class="mb-3">
-            <label for="content" class="form-label">Mensaje</label>
-            <textarea name="content" id="content" rows="4" class="form-control" required>{{ old('content') }}</textarea>
-            @error('content')
-                <small class="text-danger">{{ $message }}</small>
-            @enderror
-        </div>
+        <form action="{{ route('messages.store') }}" method="POST" enctype="multipart/form-data" novalidate>
+            @csrf
 
-        <button class="btn btn-primary" type="submit">Enviar</button>
-    </form>
-</div>
+            <div class="mb-3">
+                <label for="receiver_id" class="form-label">Destinatario</label>
+                <select name="receiver_id" id="receiver_id" class="form-select" required>
+                    <option value="" selected disabled>Selecciona un usuario</option>
+                    @foreach ($users as $user)
+                        <option value="{{ $user->id }}" {{ old('receiver_id') == $user->id ? 'selected' : '' }}>
+                            {{ $user->name }} ({{ implode(', ', $user->roles->pluck('name')->toArray()) }})
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="content" class="form-label">Mensaje</label>
+                <textarea name="content" id="content" rows="5" class="form-control" maxlength="1000" required>{{ old('content') }}</textarea>
+                <div class="form-text">Máximo 1000 caracteres.</div>
+            </div>
+
+            <div class="mb-3">
+                <label for="attachment" class="form-label">Adjuntar archivo (opcional)</label>
+                <input type="file" name="attachment" id="attachment" class="form-control"
+                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.txt,.pptx">
+                @error('attachment')
+                    <div class="text-danger mt-1">{{ $message }}</div>
+                @enderror
+                <div class="form-text">Formatos permitidos: jpg, jpeg, png, pdf, doc, docx, xls, xlsx, txt.</div>
+            </div>
+
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-send-fill"></i> Enviar Mensaje
+            </button>
+            <a href="{{ route('messages.inbox') }}" class="btn btn-secondary ms-2">Cancelar</a>
+        </form>
+    </div>
+@endsection
+@section('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect("#receiver_id", {
+                create: false,
+                sortField: {
+                    field: "text",
+                    direction: "asc"
+                },
+                placeholder: "Buscar destinatario...",
+                loadThrottle: 300,
+                maxOptions: 100,
+                plugins: ['dropdown_input']
+            });
+        });
+    </script>
 @endsection

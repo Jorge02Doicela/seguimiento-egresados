@@ -55,13 +55,21 @@
 
             {{-- Navigation links --}}
             <div class="hidden w-full lg:flex lg:w-auto lg:items-center z-dropdown" id="navbarSupportedContent">
-
                 @auth
+                    @php
+                        $unreadMessagesCount = \App\Models\Message::where('recipient_id', auth()->id())
+                            ->whereNull('read_at')
+                            ->count();
+
+                    @endphp
+
+                    {{-- Enlaces de navegación autenticados --}}
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 w-full lg:w-auto">
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                 href="{{ route('dashboard') }}">Home</a>
                         </li>
+
                         @role('admin')
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
@@ -71,7 +79,17 @@
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.surveys.index') }}">Encuestas</a>
                             </li>
+
+                            {{-- NUEVO BOTÓN: Listado Usuarios --}}
+                            <li class="mb-2 lg:mb-0">
+                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                    href="{{ route('admin.users.index') }}">
+                                    <i class="bi bi-people-fill"></i> Gestión Usuarios
+                                </a>
+                            </li>
                         @endrole
+
+
 
                         @role('graduate')
                             <li class="mb-2 lg:mb-0">
@@ -90,10 +108,24 @@
                                     href="{{ route('employer.graduates') }}">Buscar Egresados</a>
                             </li>
                         @endrole
+
+                        {{-- Enlace a Mensajes --}}
+                        <li class="mb-2 lg:mb-0">
+                            <a href="{{ route('messages.inbox') }}"
+                                class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
+                                Mensajes
+                                @if ($unreadMessagesCount > 0)
+                                    <span
+                                        class="ml-1 inline-block bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
+                                        {{ $unreadMessagesCount }}
+                                    </span>
+                                @endif
+                            </a>
+                        </li>
                     </ul>
 
+                    {{-- Enlaces del lado derecho --}}
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 lg:ml-auto">
-                        {{-- Enlaces opcionales por rol --}}
                         @role('graduate')
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
@@ -101,13 +133,11 @@
                             </li>
                         @endrole
 
-                        {{-- Perfil general justo antes del botón de cerrar sesión --}}
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                 href="{{ route('profile.edit') }}">Perfil</a>
                         </li>
 
-                        {{-- Botón de cerrar sesión --}}
                         <li class="mb-2 lg:mb-0">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
@@ -131,8 +161,8 @@
                         </li>
                     </ul>
                 @endauth
-
             </div>
+        </div>
         </div>
     </nav>
 
@@ -243,6 +273,11 @@
             ();
         </script>
     @endauth
+    <!-- Tom Select CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
+    <!-- Tom Select JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
     @yield('scripts')
 </body>

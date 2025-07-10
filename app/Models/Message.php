@@ -3,19 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Message extends Model
 {
-    protected $fillable = ['sender_id', 'receiver_id', 'content', 'read'];
+    protected $fillable = [
+        'sender_id',
+        'recipient_id',
+        'content',
+        'attachment_path',
+        'read_at',
+    ];
 
-    public function sender(): BelongsTo
+    // Relaciones
+    public function sender()
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
-    public function receiver(): BelongsTo
+    public function recipient()
     {
-        return $this->belongsTo(User::class, 'receiver_id');
+        return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    public function getIsReadAttribute()
+    {
+        return !is_null($this->read_at);
     }
 }

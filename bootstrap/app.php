@@ -11,11 +11,15 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Añade tu middleware CheckIfBlocked al grupo 'web'
+        $middleware->web(append: [
+            \App\Http\Middleware\CheckIfBlocked::class,
+        ]);
+
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
-            // Add your new middleware alias here
             'check.survey.access' => \App\Http\Middleware\CheckSurveyAccess::class,
-            // You can uncomment these if you plan to use them later
+            // Si necesitas aliases adicionales para Spatie o cualquier otro middleware, van aquí
             // 'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             // 'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
         ]);

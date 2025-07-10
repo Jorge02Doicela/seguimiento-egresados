@@ -10,11 +10,9 @@
     @endphp
 
 
-    {{-- Contenedor principal con imagen de fondo del ISUS y estilo institucional --}}
     <div class="min-h-screen flex flex-col justify-center items-center bg-gray-50 p-4 sm:p-0"
         style="background-image: url('https://tecnologicosucre.edu.ec/web/assets/images/bg-login.jpg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat;">
 
-        {{-- Logo y Sección de Título Institucional --}}
         <div class="w-full sm:max-w-md flex flex-col items-center mb-6">
             <img src="https://tecnologicosucre.edu.ec/web/wp-content/uploads/2023/08/OP1-mod.png"
                 alt="Logo Instituto Tecnológico Sucre" class="h-24 sm:h-28 mb-6 drop-shadow-lg">
@@ -28,18 +26,15 @@
             </h1>
         </div>
 
-        {{-- Tarjeta de Login --}}
         <div
             class="w-full sm:max-w-md px-6 py-8 bg-white shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm bg-opacity-85 border border-primary-lightest transform transition-all duration-300 hover:scale-[1.01] hover:shadow-3xl">
 
-            {{-- Mensaje de bloqueo por intentos fallidos --}}
             @if ($errors->has('email') && Str::contains($errors->first('email'), ['intentos', 'Too many login attempts']))
                 <div class="mb-6 p-4 text-sm text-red-800 bg-red-100 border border-red-300 rounded-lg font-open-sans">
                     {{ $errors->first('email') }}
                 </div>
             @endif
 
-            {{-- Mensaje de estado de la sesión --}}
             <x-auth-session-status
                 class="mb-6 px-4 py-3 bg-primary-lightest text-primary-dark rounded-lg border border-primary-light text-base font-open-sans"
                 :status="session('status')" />
@@ -47,7 +42,6 @@
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
-                {{-- Correo --}}
                 <div class="mb-6">
                     <x-input-label for="email" :value="__('Correo electrónico')"
                         class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
@@ -67,7 +61,6 @@
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-sm text-error font-open-sans" />
                 </div>
 
-                {{-- Contraseña --}}
                 <div class="mb-6">
                     <x-input-label for="password" :value="__('Contraseña')"
                         class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
@@ -80,15 +73,28 @@
                                     clip-rule="evenodd" />
                             </svg>
                         </div>
+
                         <x-text-input id="password"
-                            class="block w-full pl-10 pr-3 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
+                            class="block w-full pl-10 pr-12 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
                             type="password" name="password" required autocomplete="current-password"
                             placeholder="••••••••" />
+
+                        <button type="button" id="btn-show-password" onmousedown="showPassword()"
+                            onmouseup="hidePassword()" onmouseleave="hidePassword()"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-800 focus:outline-none"
+                            aria-label="Mostrar contraseña" title="Mantén presionado para ver contraseña">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="#0000FF" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
                     </div>
                     <x-input-error :messages="$errors->get('password')" class="mt-2 text-sm text-error font-open-sans" />
                 </div>
 
-                {{-- Recordar sesión y recuperar --}}
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center">
                         <input id="remember_me" name="remember" type="checkbox"
@@ -105,23 +111,6 @@
                     @endif
                 </div>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                {{-- Botón --}}
                 @php
                     $errorMessage = $errors->has('email') ? $errors->first('email') : '';
                     $bloqueado =
@@ -141,7 +130,6 @@
         transition duration-200 ease-in-out transform
         {{ $bloqueado ? 'bg-gray-400 cursor-not-allowed opacity-70' : 'bg-primary hover:bg-primary-dark hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary' }}"
                         {{ $bloqueado ? 'disabled' : '' }}>
-                        {{-- SVG y texto --}}
                         <svg class="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                             fill="currentColor">
                             <path fill-rule="evenodd"
@@ -180,7 +168,6 @@
             </form>
         </div>
 
-        {{-- Footer --}}
         <div
             class="w-full sm:max-w-md mt-6 px-6 py-4 text-center bg-white/90 rounded-lg shadow-lg border border-primary-lightest">
             <p class="text-sm text-text-secondary font-open-sans">
@@ -188,4 +175,19 @@
             </p>
         </div>
     </div>
+
+    <script>
+        const passwordInput = document.getElementById('password');
+        const btnShowPassword = document.getElementById('btn-show-password');
+
+        function showPassword() {
+            passwordInput.type = 'text';
+        }
+
+        function hidePassword() {
+            passwordInput.type = 'password';
+        }
+
+        passwordInput.addEventListener('blur', hidePassword);
+    </script>
 </x-guest-layout>

@@ -10,42 +10,82 @@
                 alt="Logo Instituto Tecnológico Sucre" class="h-24 sm:h-28 mb-6 drop-shadow-lg">
 
             {{-- Título del sistema o de la acción --}}
-            <h1 class="text-center text-white bg-blue-institutional px-5 py-3 rounded-xl shadow-primary mt-4 font-montserrat tracking-wide leading-tight">
+            <h1
+                class="text-center text-white bg-blue-institutional px-5 py-3 rounded-xl shadow-primary mt-4 font-montserrat tracking-wide leading-tight">
                 <span class="block text-2xl sm:text-3xl font-extrabold mb-1">Restablecer Contraseña</span>
-                <span class="block text-xs sm:text-sm font-normal opacity-80 mt-1">Ingresa tus datos para establecer una nueva contraseña</span>
+                <span class="block text-xs sm:text-sm font-normal opacity-80 mt-1">Ingresa tus datos para establecer una
+                    nueva contraseña</span>
             </h1>
         </div>
 
         {{-- Tarjeta del Formulario de Restablecimiento --}}
-        <div class="w-full sm:max-w-md px-6 py-8 bg-white shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm bg-opacity-85 border border-primary-lightest transform transition-all duration-300 hover:scale-[1.01] hover:shadow-3xl">
+        <div
+            class="w-full sm:max-w-md px-6 py-8 bg-white shadow-2xl rounded-xl overflow-hidden backdrop-blur-sm bg-opacity-85 border border-primary-lightest transform transition-all duration-300 hover:scale-[1.01] hover:shadow-3xl">
             <form method="POST" action="{{ route('password.store') }}">
                 @csrf
 
                 <input type="hidden" name="token" value="{{ $request->route('token') }}">
 
                 <div class="mb-6">
-                    <x-input-label for="email" :value="__('Correo electrónico')" class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
+                    <x-input-label for="email" :value="__('Correo electrónico')"
+                        class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
                     <div class="relative rounded-lg shadow-sm">
-                        <x-text-input id="email" class="block w-full pl-3 pr-3 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
-                            type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" placeholder="usuario@tecnologicosucre.edu.ec" />
+                        <x-text-input id="email"
+                            class="block w-full pl-3 pr-3 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
+                            type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username"
+                            placeholder="usuario@tecnologicosucre.edu.ec" />
                     </div>
                     <x-input-error :messages="$errors->get('email')" class="mt-2 text-sm text-error font-open-sans" />
                 </div>
 
-                <div class="mb-6">
-                    <x-input-label for="password" :value="__('Nueva Contraseña')" class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
+                <div class="mb-6 relative">
+                    <x-input-label for="password" :value="__('Nueva Contraseña')"
+                        class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
                     <div class="relative rounded-lg shadow-sm">
-                        <x-text-input id="password" class="block w-full pl-3 pr-3 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
-                            type="password" name="password" required autocomplete="new-password" placeholder="••••••••" />
+                        <x-text-input id="password"
+                            class="block w-full pl-3 pr-12 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
+                            type="password" name="password" required autocomplete="new-password"
+                            placeholder="••••••••" />
+
+                        <button type="button" id="btn-show-password" onmousedown="showPassword('password')"
+                            onmouseup="hidePassword('password')" onmouseleave="hidePassword('password')"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-800 focus:outline-none"
+                            aria-label="Mostrar contraseña" title="Mantén presionado para ver contraseña">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="#0000FF" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
                     </div>
                     <x-input-error :messages="$errors->get('password')" class="mt-2 text-sm text-error font-open-sans" />
                 </div>
 
-                <div class="mb-6">
-                    <x-input-label for="password_confirmation" :value="__('Confirmar Contraseña')" class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
+                <div class="mb-6 relative">
+                    <x-input-label for="password_confirmation" :value="__('Confirmar Contraseña')"
+                        class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
                     <div class="relative rounded-lg shadow-sm">
-                        <x-text-input id="password_confirmation" class="block w-full pl-3 pr-3 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
-                            type="password" name="password_confirmation" required autocomplete="new-password" placeholder="••••••••" />
+                        <x-text-input id="password_confirmation"
+                            class="block w-full pl-3 pr-12 py-2 border border-secondary rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder-gray-400 font-open-sans"
+                            type="password" name="password_confirmation" required autocomplete="new-password"
+                            placeholder="••••••••" />
+
+                        <button type="button" id="btn-show-password-confirm"
+                            onmousedown="showPassword('password_confirmation')"
+                            onmouseup="hidePassword('password_confirmation')"
+                            onmouseleave="hidePassword('password_confirmation')"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-600 hover:text-blue-800 focus:outline-none"
+                            aria-label="Mostrar confirmar contraseña" title="Mantén presionado para ver contraseña">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                stroke="#0000FF" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
                     </div>
                     <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2 text-sm text-error font-open-sans" />
                 </div>
@@ -60,10 +100,28 @@
         </div>
 
         {{-- Footer Institucional --}}
-        <div class="w-full sm:max-w-md mt-6 px-6 py-4 text-center bg-white/90 rounded-lg shadow-lg border border-primary-lightest">
+        <div
+            class="w-full sm:max-w-md mt-6 px-6 py-4 text-center bg-white/90 rounded-lg shadow-lg border border-primary-lightest">
             <p class="text-sm text-text-secondary font-open-sans">
                 © {{ date('Y') }} Instituto Superior Universitario Tecnológico Sucre
             </p>
         </div>
     </div>
+
+    <script>
+        // Mostrar y ocultar contraseñas con mantener presionado el botón
+        function showPassword(id) {
+            const input = document.getElementById(id);
+            if (input) {
+                input.type = 'text';
+            }
+        }
+
+        function hidePassword(id) {
+            const input = document.getElementById(id);
+            if (input) {
+                input.type = 'password';
+            }
+        }
+    </script>
 </x-guest-layout>

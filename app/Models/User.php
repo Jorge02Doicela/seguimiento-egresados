@@ -6,10 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
-use App\Models\Graduate;
-use App\Models\Employer;
-use App\Models\Answer;
-use App\Models\Message;
 
 class User extends Authenticatable
 {
@@ -19,6 +15,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_blocked', // recuerda agregar este campo en la migración y base de datos
     ];
 
     protected $hidden = [
@@ -28,6 +25,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_blocked' => 'boolean',
         'password' => 'hashed',
     ];
 
@@ -43,7 +41,6 @@ class User extends Authenticatable
         return $this->hasOne(Employer::class);
     }
 
-    // Resumen: una sola relación para perfil egresado
     public function graduateProfile()
     {
         return $this->hasOne(Graduate::class);
@@ -61,9 +58,37 @@ class User extends Authenticatable
 
     public function messagesReceived()
     {
-        return $this->hasMany(Message::class, 'receiver_id');
+        return $this->hasMany(Message::class, 'recipient_id');  // corregido aquí
     }
 
-    // ¡Importante! No definas aquí la función notifications()
-    // El trait Notifiable ya define la relación con la tabla 'notifications'
+    /**
+     * Obtener lista de usuarios a quienes este usuario puede enviar mensajes.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getAllowedRecipients()
+    {
+        $role = $this->getRoleNames()->first(); // Obtener primer rol asignado
+
+        if ($role === 'admin') {
+            // Admin puede enviar a todos excepto a sí mismo
+            return User::where('id', '<>', $this->id)->get();
+        }
+
+        if ($role === 'graduate') {
+            // Egresado puede enviar a admin y empleadores
+            $allowedRoles = ['admin', 'employer'];
+        } elseif ($role === 'employer') {
+            // Empleador puede enviar a admin y egresados
+            $allowedRoles = ['admin', 'graduate'];
+        } else {
+            // Otros roles: no enviar a nadie
+            return collect();
+        }
+
+        return User::where('id', '<>', $this->id)
+            ->whereHas('roles', function ($query) use ($allowedRoles) {
+                $query->whereIn('name', $allowedRoles);
+            })->get();
+    }
 }
