@@ -67,27 +67,27 @@
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 w-full lg:w-auto">
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                href="{{ route('dashboard') }}">Home</a>
+                                href="{{ route('dashboard') }}">Inicio</a>
                         </li>
 
                         @role('admin')
-                            <li class="mb-2 lg:mb-0">
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('admin.dashboard') }}">Admin Panel</a>
-                            </li>
-                            <li class="mb-2 lg:mb-0">
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('admin.surveys.index') }}">Encuestas</a>
-                            </li>
-
-                            {{-- NUEVO BOTÓN: Listado Usuarios --}}
+                            <!-- Botón ya existente: Gestión Usuarios -->
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.users.index') }}">
                                     <i class="bi bi-people-fill"></i> Gestión Usuarios
                                 </a>
                             </li>
+
+                            <!-- NUEVO BOTÓN: Gestión Empleadores -->
+                            <li class="mb-2 lg:mb-0">
+                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                    href="{{ route('admin.employers.index') }}">
+                                    <i class="bi bi-building"></i> Gestión Empleadores
+                                </a>
+                            </li>
                         @endrole
+
 
 
 
@@ -101,11 +101,14 @@
                         @role('employer')
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('employer.home') }}">Empleador</a>
+                                    href="{{ route('employer.profile.show') }}">
+                                    <i class="bi bi-person-circle mr-1"></i> Perfil Empresa
+                                </a>
+
                             </li>
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('employer.graduates') }}">Buscar Egresados</a>
+                                    href="{{ route('employer.graduates') }}">Buscar egresados</a>
                             </li>
                         @endrole
 
@@ -135,7 +138,7 @@
 
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                href="{{ route('profile.edit') }}">Perfil</a>
+                                href="{{ route('profile.edit') }}">Configuración</a>
                         </li>
 
                         <li class="mb-2 lg:mb-0">

@@ -37,9 +37,9 @@ class RegisteredUserController extends Controller
                 'required',
                 'confirmed',
                 Password::min(8)
-                    ->mixedCase() // al menos una mayúscula y una minúscula
-                    ->numbers()   // al menos un número
-                    ->symbols(),  // al menos un símbolo
+                    ->mixedCase()
+                    ->numbers()
+                    ->symbols(),
             ],
             'role' => ['required', 'in:graduate,employer'],
             'phone' => ['nullable', 'string', 'max:50'],
@@ -53,12 +53,18 @@ class RegisteredUserController extends Controller
         if ($request->role === 'employer') {
             $rules['company_name'] = ['required', 'string', 'max:255'];
             $rules['contact_name'] = ['required', 'string', 'max:255'];
+            $rules['ruc'] = ['required', 'digits:13', 'unique:employers,ruc'];
         } else {
             $rules['company_name'] = ['nullable'];
             $rules['contact_name'] = ['nullable'];
+            $rules['ruc'] = ['nullable'];
         }
 
-        $request->validate($rules);
+        $messages = [
+            'ruc.unique' => 'El RUC ya está registrado. Por favor ingresa uno diferente.',
+        ];
+
+        $request->validate($rules, $messages);
 
         $user = User::create([
             'name' => $request->name,
@@ -69,12 +75,10 @@ class RegisteredUserController extends Controller
         $user->assignRole($request->role);
 
         if ($request->role === 'graduate') {
-            Log::info('Creando egresado con user_id:', ['user_id' => $user->id]);
-
             Graduate::create([
                 'user_id' => $user->id,
                 'cohort_year' => now()->year,
-                'gender' => 'Otro', // puedes cambiar esto por lógica dinámica
+                'gender' => 'Otro',
                 'company' => null,
                 'position' => null,
                 'salary' => null,
@@ -89,12 +93,14 @@ class RegisteredUserController extends Controller
                 'user_id' => $user->id,
                 'company_name' => $request->company_name,
                 'contact_name' => $request->contact_name,
+                'ruc' => $request->ruc,
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'website' => $request->website,
                 'sector' => $request->sector,
                 'country' => $request->country,
                 'city' => $request->city,
+                'is_verified' => false,
             ]);
         }
 

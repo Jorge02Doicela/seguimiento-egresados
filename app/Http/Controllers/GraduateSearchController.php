@@ -25,9 +25,16 @@ class GraduateSearchController extends Controller
 
         $graduates = $query->with('user')->paginate(10);
 
+        // Obtener años únicos de cohorte ordenados desc
+        $cohortYears = Graduate::select('cohort_year')
+            ->distinct()
+            ->orderBy('cohort_year', 'desc')
+            ->pluck('cohort_year');
+
         return view('employer.graduates', [
             'graduates' => $graduates,
             'filters' => $request->only('cohort_year', 'gender', 'sector'),
+            'cohortYears' => $cohortYears,
         ]);
     }
 }

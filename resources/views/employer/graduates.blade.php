@@ -9,9 +9,17 @@
         <form method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8 p-6 bg-white shadow-md rounded-lg">
             <div class="col-span-1">
                 <label for="cohort_year" class="block text-sm font-medium text-text-secondary mb-1">Cohorte</label>
-                <input type="number" id="cohort_year" name="cohort_year" class="form-input"
-                    value="{{ $filters['cohort_year'] ?? '' }}">
+                <select id="cohort_year" name="cohort_year" class="form-select">
+                    <option value="">-- Todos --</option>
+                    @foreach ($cohortYears as $year)
+                        <option value="{{ $year }}"
+                            {{ isset($filters['cohort_year']) && $filters['cohort_year'] == $year ? 'selected' : '' }}>
+                            {{ $year }}
+                        </option>
+                    @endforeach
+                </select>
             </div>
+
             <div class="col-span-1">
                 <label for="gender" class="block text-sm font-medium text-text-secondary mb-1">Género</label>
                 <select id="gender" name="gender" class="form-select">

@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \Spatie\Permission\Middleware\RoleMiddleware::class,
             'check.survey.access' => \App\Http\Middleware\CheckSurveyAccess::class,
+            'verified.employer' => \App\Http\Middleware\EnsureEmployerIsVerified::class,
             // Si necesitas aliases adicionales para Spatie o cualquier otro middleware, van aquí
             // 'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             // 'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,

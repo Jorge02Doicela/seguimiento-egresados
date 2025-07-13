@@ -13,6 +13,16 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SurveyDashboardController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\EmployerController;
+use App\Http\Controllers\Employer\ProfileController as EmployerProfileController;
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,8 +30,29 @@ Route::get('/', function () {
 
 // Dashboard general para usuarios autenticados y verificados
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+    $user = auth()->user();
+
+    if ($user->hasRole('admin')) {
+        return redirect()->route('admin.dashboard');
+    }
+
+    if ($user->hasRole('graduate')) {
+        return redirect()->route('graduate.home');
+    }
+
+    if ($user->hasRole('employer')) {
+        $employer = $user->employer;
+
+        if (!$employer || !$employer->is_verified) {
+            return response()->view('auth.pending_verification');
+        }
+
+        return redirect()->route('employer.home');
+    }
+
+    abort(403, 'Acceso no autorizado');
+})->middleware(['auth'])->name('dashboard');
+
 
 // Rutas perfil común (usuarios autenticados)
 Route::middleware('auth')->group(function () {
@@ -30,7 +61,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Rutas exclusivas Admin con CRUD completo para encuestas, dashboards y usuarios
+// Rutas exclusivas Admin con CRUD completo para encuestas, dashboards, usuarios y empleadores
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
 
     // Dashboard principal admin
@@ -60,13 +91,19 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Gestión de usuarios (simplificado con resource)
     Route::resource('users', UserController::class);
 
-    // Otras rutas...
+    // Resource parcial para empleadores (sin crear ni almacenar nuevos)
+    Route::resource('employers', EmployerController::class)->except(['create', 'store']);
+
+    // Ruta para verificar / desverificar empleadores
+    Route::patch('employers/{employer}/verify', [EmployerController::class, 'verify'])->name('employers.verify');
+
+    // Otras rutas admin
     Route::patch('users/{user}/toggle-block', [UserController::class, 'toggleBlock'])->name('users.toggle-block');
 });
 
-
 // Rutas exclusivas Egresados (graduate)
 Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate.')->group(function () {
+
     // Perfil egresado
     Route::get('/profile', [GraduateProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [GraduateProfileController::class, 'edit'])->name('profile.edit');
@@ -74,10 +111,6 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
     Route::post('/profile/skills/add', [GraduateProfileController::class, 'addSkill'])->name('profile.skills.add');
     Route::post('/profile/skills/remove', [GraduateProfileController::class, 'removeSkill'])->name('profile.skills.remove');
 
-    // Home egresado
-    Route::get('/home', function () {
-        return view('graduate.home');
-    })->name('home');
 
     // Encuestas para responder
     Route::get('/surveys', [SurveyResponseController::class, 'index'])->name('surveys.index');
@@ -85,18 +118,30 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
     Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->middleware('check.survey.access')->name('surveys.answers.store');
 });
 
-// Rutas exclusivas Empleadores
-Route::middleware(['auth', 'role:employer'])->prefix('employer')->name('employer.')->group(function () {
+// Rutas exclusivas Empleadores (con middleware que restringe acceso si no están verificados)
+Route::middleware(['auth', 'role:employer', 'verified.employer'])->prefix('employer')->name('employer.')->group(function () {
     Route::get('/home', function () {
-        return view('employer.home');
+        return view('dashboard');
     })->name('home');
 
-    // Controlador para listar egresados
+    Route::get('/home-view', function () {
+        return view('employer.home');
+    })->name('home.view');
+
     Route::get('/graduates', [GraduateSearchController::class, 'index'])->name('graduates');
+
+    // Aquí corregir las rutas para perfil empleador
+    Route::get('/profile', [EmployerProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profile/edit', [EmployerProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [EmployerProfileController::class, 'update'])->name('profile.update');
 });
 
+
+
+
 // Rutas para mensajes y notificaciones (usuarios autenticados)
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
+
     // Mensajes
     Route::get('/messages', [MessageController::class, 'inbox'])->name('messages.inbox');
     Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
