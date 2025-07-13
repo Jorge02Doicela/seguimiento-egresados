@@ -33,11 +33,11 @@ Route::get('/dashboard', function () {
     $user = auth()->user();
 
     if ($user->hasRole('admin')) {
-        return redirect()->route('admin.dashboard');
+        return view('dashboard');
     }
 
     if ($user->hasRole('graduate')) {
-        return redirect()->route('graduate.home');
+        return view('dashboard');
     }
 
     if ($user->hasRole('employer')) {

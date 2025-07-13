@@ -67,34 +67,51 @@
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 w-full lg:w-auto">
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                href="{{ route('dashboard') }}">Inicio</a>
+                                href="{{ route('dashboard') }}">
+                                <i class="bi bi-house-door-fill mr-1"></i> Inicio
+                            </a>
                         </li>
 
                         @role('admin')
-                            <!-- Botón ya existente: Gestión Usuarios -->
+                            <!-- Botón existente: Gestión Usuarios -->
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.users.index') }}">
-                                    <i class="bi bi-people-fill"></i> Gestión Usuarios
+                                    <i class="bi bi-people-fill mr-1"></i> Gestión Usuarios
                                 </a>
                             </li>
 
-                            <!-- NUEVO BOTÓN: Gestión Empleadores -->
+                            <!-- Botón existente: Gestión Empleadores -->
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.employers.index') }}">
-                                    <i class="bi bi-building"></i> Gestión Empleadores
+                                    <i class="bi bi-building mr-1"></i> Gestión Empleadores
+                                </a>
+                            </li>
+
+                            <!-- NUEVO BOTÓN: Dashboard Admin -->
+                            <li class="mb-2 lg:mb-0">
+                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                    href="{{ route('admin.dashboard') }}">
+                                    <i class="bi bi-speedometer2 mr-1"></i> Dashboard Admin
+                                </a>
+                            </li>
+
+                            <!-- NUEVO BOTÓN: Encuestas -->
+                            <li class="mb-2 lg:mb-0">
+                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                    href="{{ route('admin.surveys.index') }}">
+                                    <i class="bi bi-list-check mr-1"></i> Encuestas
                                 </a>
                             </li>
                         @endrole
 
-
-
-
                         @role('graduate')
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('graduate.surveys.index') }}">Responder Encuestas</a>
+                                    href="{{ route('graduate.surveys.index') }}">
+                                    <i class="bi bi-clipboard-check mr-1"></i> Responder Encuestas
+                                </a>
                             </li>
                         @endrole
 
@@ -104,11 +121,12 @@
                                     href="{{ route('employer.profile.show') }}">
                                     <i class="bi bi-person-circle mr-1"></i> Perfil Empresa
                                 </a>
-
                             </li>
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('employer.graduates') }}">Buscar egresados</a>
+                                    href="{{ route('employer.graduates') }}">
+                                    <i class="bi bi-search mr-1"></i> Buscar egresados
+                                </a>
                             </li>
                         @endrole
 
@@ -116,7 +134,7 @@
                         <li class="mb-2 lg:mb-0">
                             <a href="{{ route('messages.inbox') }}"
                                 class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
-                                Mensajes
+                                <i class="bi bi-chat-left-text-fill mr-1"></i> Mensajes
                                 @if ($unreadMessagesCount > 0)
                                     <span
                                         class="ml-1 inline-block bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
@@ -132,21 +150,28 @@
                         @role('graduate')
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('graduate.profile.show') }}">Perfil Egresado</a>
+                                    href="{{ route('graduate.profile.show') }}">
+                                    <i class="bi bi-person-fill mr-1"></i> Perfil Egresado
+                                </a>
                             </li>
                         @endrole
 
-                        <li class="mb-2 lg:mb-0">
-                            <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                href="{{ route('profile.edit') }}">Configuración</a>
-                        </li>
+                        @role('graduate|employer')
+                            <li class="mb-2 lg:mb-0">
+                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
+                                    href="{{ route('profile.edit') }}">
+                                    <i class="bi bi-gear-fill mr-1"></i> Configuración
+                                </a>
+                            </li>
+                        @endrole
+
 
                         <li class="mb-2 lg:mb-0">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
                                     class="w-full text-left py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200 focus:outline-none">
-                                    Cerrar sesión
+                                    <i class="bi bi-box-arrow-right mr-1"></i> Cerrar sesión
                                 </button>
                             </form>
                         </li>
@@ -156,11 +181,15 @@
                     <ul class="flex flex-col lg:flex-row lg:space-x-8 mt-4 lg:mt-0 lg:ml-auto">
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                href="{{ route('login') }}">Ingresar</a>
+                                href="{{ route('login') }}">
+                                <i class="bi bi-box-arrow-in-right mr-1"></i> Ingresar
+                            </a>
                         </li>
                         <li class="mb-2 lg:mb-0">
                             <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                href="{{ route('register') }}">Registrarse</a>
+                                href="{{ route('register') }}">
+                                <i class="bi bi-person-plus-fill mr-1"></i> Registrarse
+                            </a>
                         </li>
                     </ul>
                 @endauth

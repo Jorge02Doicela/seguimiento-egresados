@@ -12,7 +12,11 @@ use Illuminate\Validation\Rule;
 class UserController extends Controller
 {
     /**
-     * Mostrar listado de usuarios con filtro por búsqueda y rol.
+     * Mostrar listado paginado de usuarios, con opción a filtrar
+     * por nombre/email y por rol asignado.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -21,32 +25,41 @@ class UserController extends Controller
 
         $users = User::query()
             ->when($search, function ($query, $search) {
+                // Filtrar usuarios cuyo nombre o email contengan el término de búsqueda
                 $query->where('name', 'like', "%$search%")
                     ->orWhere('email', 'like', "%$search%");
             })
             ->when($roleFilter, function ($query, $roleFilter) {
+                // Filtrar usuarios que tengan asignado un rol específico
                 $query->whereHas('roles', function ($q) use ($roleFilter) {
                     $q->where('id', $roleFilter);
                 });
             })
-            ->paginate(15);
+            ->paginate(15); // Paginación para evitar cargar demasiados registros
 
-        $roles = Role::all();
+        $roles = Role::all(); // Obtener todos los roles para filtro en vista
 
         return view('admin.users.index', compact('users', 'search', 'roles', 'roleFilter'));
     }
 
     /**
-     * Mostrar formulario de creación de usuario.
+     * Mostrar formulario para crear un nuevo usuario.
+     *
+     * @return \Illuminate\View\View
      */
     public function create()
     {
+        // Obtener lista de roles con formato [id => nombre] para selector
         $roles = Role::pluck('name', 'id');
+
         return view('admin.users.create', compact('roles'));
     }
 
     /**
-     * Almacenar un nuevo usuario.
+     * Validar y almacenar un nuevo usuario en la base de datos.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
@@ -54,6 +67,7 @@ class UserController extends Controller
             'password.regex' => 'La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una minúscula y un número.',
         ];
 
+        // Validación de campos con reglas estrictas para contraseña segura
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users,email'],
@@ -61,18 +75,20 @@ class UserController extends Controller
                 'required',
                 'string',
                 'min:8',
-                'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+                'confirmed', // Confirma que el campo password_confirmation sea igual
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/', // Regex para validar mayúscula, minúscula y número
             ],
             'role_id' => ['required', 'exists:roles,id'],
         ], $messages);
 
+        // Crear usuario con contraseña hasheada
         $user = User::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
 
+        // Asignar rol al usuario recién creado
         $role = Role::findOrFail($data['role_id']);
         $user->assignRole($role->name);
 
@@ -80,18 +96,28 @@ class UserController extends Controller
     }
 
     /**
-     * Mostrar formulario de edición de usuario.
+     * Mostrar formulario para editar un usuario existente.
+     *
+     * @param User $user
+     * @return \Illuminate\View\View
      */
     public function edit(User $user)
     {
+        // Obtener roles para selector en formulario
         $roles = Role::pluck('name', 'id');
-        $userRole = $user->roles->pluck('id')->first(); // Asumimos 1 rol por usuario
+
+        // Obtener primer rol asignado al usuario (se asume 1 rol por usuario)
+        $userRole = $user->roles->pluck('id')->first();
 
         return view('admin.users.edit', compact('user', 'roles', 'userRole'));
     }
 
     /**
-     * Actualizar un usuario.
+     * Validar y actualizar datos de usuario existente.
+     *
+     * @param Request $request
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, User $user)
     {
@@ -99,33 +125,37 @@ class UserController extends Controller
             'password.regex' => 'La contraseña debe tener al menos 8 caracteres, incluir una letra mayúscula, una minúscula y un número.',
         ];
 
+        // Validar datos; contraseña es opcional y solo se actualiza si se envía
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('users')->ignore($user->id),
+                Rule::unique('users')->ignore($user->id), // Ignorar email actual para evitar error de unicidad
             ],
             'password' => [
                 'nullable',
                 'string',
                 'min:8',
                 'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/'
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
             ],
             'role_id' => ['required', 'exists:roles,id'],
         ], $messages);
 
+        // Actualizar campos básicos
         $user->name = $data['name'];
         $user->email = $data['email'];
 
+        // Actualizar contraseña solo si se envió y validó
         if (!empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
 
         $user->save();
 
+        // Sincronizar rol (remplaza roles previos)
         $role = Role::findOrFail($data['role_id']);
         $user->syncRoles([$role->name]);
 
@@ -133,7 +163,11 @@ class UserController extends Controller
     }
 
     /**
-     * Eliminar un usuario.
+     * Eliminar usuario de la base de datos.
+     * Evita que un usuario se elimine a sí mismo para no perder acceso.
+     *
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(User $user)
     {
@@ -142,19 +176,24 @@ class UserController extends Controller
         }
 
         $user->delete();
+
         return redirect()->route('admin.users.index')->with('success', 'Usuario eliminado correctamente.');
     }
 
     /**
-     * Alternar bloqueo de usuario.
+     * Alternar estado de bloqueo del usuario (bloqueado/desbloqueado).
+     * Previene bloqueo de sí mismo para evitar quedar sin acceso.
+     *
+     * @param User $user
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function toggleBlock(User $user)
     {
-        // Evitar que un admin se bloquee a sí mismo (opcional)
         if (auth()->id() === $user->id) {
             return redirect()->back()->with('error', 'No puedes bloquear tu propio usuario.');
         }
 
+        // Cambiar el estado booleano de bloqueo
         $user->is_blocked = !$user->is_blocked;
         $user->save();
 
