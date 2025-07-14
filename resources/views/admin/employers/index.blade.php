@@ -1,4 +1,4 @@
-@extends('layouts.admin') {{-- O tu layout admin principal --}}
+@extends('layouts.admin')
 
 @section('title', 'Gestión de Empleadores')
 
@@ -17,7 +17,6 @@
                 <tr class="bg-gray-100 text-left">
                     <th class="px-4 py-2 border">ID</th>
                     <th class="px-4 py-2 border">Empresa</th>
-                    <th class="px-4 py-2 border">Contacto</th>
                     <th class="px-4 py-2 border">Usuario (email)</th>
                     <th class="px-4 py-2 border">Estado</th>
                     <th class="px-4 py-2 border">Acciones</th>
@@ -28,7 +27,6 @@
                     <tr>
                         <td class="border px-4 py-2">{{ $employer->id }}</td>
                         <td class="border px-4 py-2">{{ $employer->company_name }}</td>
-                        <td class="border px-4 py-2">{{ $employer->contact_name }}</td>
                         <td class="border px-4 py-2">{{ $employer->user->email ?? 'N/A' }}</td>
                         <td class="border px-4 py-2">
                             @if ($employer->is_verified)
@@ -37,21 +35,15 @@
                                 <span class="text-red-600 font-semibold">Pendiente</span>
                             @endif
                         </td>
-                        <td class="border border-gray-300 px-4 py-2 space-x-2">
-
-                            <!-- Ver detalles -->
+                        <td class="border px-4 py-2 space-x-2">
                             <a href="{{ route('admin.employers.show', $employer) }}" class="btn btn-info btn-sm"
                                 title="Ver detalles">
                                 <i class="bi bi-eye"></i>
                             </a>
-
-                            <!-- Editar -->
                             <a href="{{ route('admin.employers.edit', $employer) }}" class="btn btn-warning btn-sm"
                                 title="Editar">
                                 <i class="bi bi-pencil"></i>
                             </a>
-
-                            <!-- Verificar / Desverificar -->
                             <form action="{{ route('admin.employers.verify', $employer) }}" method="POST" class="inline">
                                 @csrf
                                 @method('PATCH')
@@ -65,12 +57,11 @@
                                     @endif
                                 </button>
                             </form>
-
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center p-4">No hay empleadores registrados.</td>
+                        <td colspan="5" class="text-center p-4">No hay empleadores registrados.</td>
                     </tr>
                 @endforelse
             </tbody>

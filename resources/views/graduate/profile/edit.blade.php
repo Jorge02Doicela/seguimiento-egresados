@@ -52,6 +52,19 @@
                     </select>
                 </div>
 
+                <div class="mb-5">
+                    <label for="career_id" class="block text-sm font-medium text-text-secondary mb-2">Carrera</label>
+                    <select name="career_id" id="career_id" class="form-select">
+                        <option value="">Seleccione una carrera</option>
+                        @foreach ($careers as $career)
+                            <option value="{{ $career->id }}"
+                                {{ old('career_id', $graduate->career_id) == $career->id ? 'selected' : '' }}>
+                                {{ $career->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
                 <div id="workFields" class="border-t border-border-primary pt-5 mt-5">
                     <h3 class="text-2xl font-headings text-text-primary mb-4">Detalles Laborales</h3>
                     <div class="mb-5">
@@ -93,7 +106,8 @@
                     </div>
 
                     <div class="mb-5">
-                        <label for="cv" class="block text-sm font-medium text-text-secondary mb-2">Subir CV (PDF, DOC,
+                        <label for="cv" class="block text-sm font-medium text-text-secondary mb-2">Subir CV (PDF,
+                            DOC,
                             DOCX)</label>
                         <input type="file" name="cv" id="cv"
                             class="block w-full text-sm text-text-secondary

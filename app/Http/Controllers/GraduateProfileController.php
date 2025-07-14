@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Graduate;
 use App\Models\Skill;
+use App\Models\Career;
 
 class GraduateProfileController extends Controller
 {
@@ -32,8 +33,9 @@ class GraduateProfileController extends Controller
             ->firstOrFail();
 
         $allSkills = Skill::all();
+        $careers = Career::all();
 
-        return view('graduate.profile.edit', compact('graduate', 'allSkills'));
+        return view('graduate.profile.edit', compact('graduate', 'allSkills', 'careers'));
     }
 
     /**
@@ -55,12 +57,15 @@ class GraduateProfileController extends Controller
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
             'country' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
+            'career_id' => 'nullable|exists:careers,id',
         ]);
 
         $graduate->fill($validated);
 
+        // Opcionalmente explícito:
+        // $graduate->career_id = $request->career_id;
+
         if ($request->hasFile('cv')) {
-            // Borra el archivo anterior si existe
             if ($graduate->cv_path && Storage::disk('public')->exists($graduate->cv_path)) {
                 Storage::disk('public')->delete($graduate->cv_path);
             }

@@ -173,25 +173,6 @@
                         <x-input-error :messages="$errors->get('company_name')" class="mt-2 text-sm text-red-600 font-open-sans" />
                     </div>
 
-                    {{-- contact_name --}}
-                    <div>
-                        <x-input-label for="contact_name" :value="__('Nombre de contacto')"
-                            class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
-                        <x-text-input id="contact_name" name="contact_name" type="text" :value="old('contact_name')"
-                            placeholder="Nombre de la persona de contacto"
-                            class="block w-full border border-secondary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-open-sans" />
-                        <x-input-error :messages="$errors->get('contact_name')" class="mt-2 text-sm text-red-600 font-open-sans" />
-                    </div>
-
-                    {{-- ruc --}}
-                    <div>
-                        <x-input-label for="ruc" :value="__('RUC de la empresa')"
-                            class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
-                        <x-text-input id="ruc" name="ruc" type="text" :value="old('ruc')"
-                            placeholder="Ejemplo: 1790012345001"
-                            class="block w-full border border-secondary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-open-sans" />
-                        <x-input-error :messages="$errors->get('ruc')" class="mt-2 text-sm text-red-600 font-open-sans" />
-                    </div>
 
                     {{-- phone --}}
                     <div>
@@ -235,15 +216,16 @@
                         <x-input-error :messages="$errors->get('sector')" class="mt-2 text-sm text-red-600 font-open-sans" />
                     </div>
 
-                    {{-- country --}}
+                    {{-- city --}}
                     <div>
-                        <x-input-label for="country" :value="__('País')"
+                        <x-input-label for="city" :value="__('Ciudad')"
                             class="block text-sm font-semibold text-text-secondary mb-2 font-montserrat" />
-                        <x-text-input id="country" name="country" type="text" :value="old('country')"
-                            placeholder="Ejemplo: Ecuador"
+                        <x-text-input id="city" name="city" type="text" :value="old('city')"
+                            placeholder="Ejemplo: Quito"
                             class="block w-full border border-secondary rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-open-sans" />
-                        <x-input-error :messages="$errors->get('country')" class="mt-2 text-sm text-red-600 font-open-sans" />
+                        <x-input-error :messages="$errors->get('city')" class="mt-2 text-sm text-red-600 font-open-sans" />
                     </div>
+
                 </div>
 
                 <div class="mt-8">

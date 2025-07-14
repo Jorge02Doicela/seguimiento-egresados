@@ -18,10 +18,6 @@ class CreateEmployersTable extends Migration
 
                 // Información principal
                 $table->string('company_name');
-                $table->string('contact_name');
-
-                // Agregamos RUC aquí
-                $table->string('ruc', 13)->unique();
 
                 // Información de contacto y empresa
                 $table->string('phone')->nullable();
@@ -35,7 +31,6 @@ class CreateEmployersTable extends Migration
                 // Datos adicionales
                 $table->string('website')->nullable();
                 $table->string('sector')->nullable();
-                $table->string('country')->nullable();
                 $table->string('city')->nullable();
 
                 // Identificación fiscal, único (si `tax_id` es diferente de `ruc`, sino elimina este)

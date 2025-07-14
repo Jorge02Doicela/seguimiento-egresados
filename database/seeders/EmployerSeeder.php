@@ -22,8 +22,12 @@ class EmployerSeeder extends Seeder
         Employer::create([
             'user_id' => $user->id,
             'company_name' => 'Empresa Contratante S.A.',
-            'contact_name' => 'Juan Pérez',
-            'ruc' => '1234567890001',  // <-- Campo RUC agregado con valor de ejemplo
+            'phone' => '0999999999',
+            'address' => 'Av. Principal 123',
+            'website' => 'https://www.empresacontratante.com',
+            'sector' => 'Tecnología',
+            'city' => 'Quito',
+            'is_verified' => false,
         ]);
     }
 }

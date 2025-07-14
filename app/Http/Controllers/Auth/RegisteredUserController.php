@@ -11,7 +11,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\View\View;
 
@@ -46,37 +45,20 @@ class RegisteredUserController extends Controller
             'address' => ['nullable', 'string', 'max:255'],
             'website' => ['nullable', 'url', 'max:255'],
             'sector' => ['nullable', 'string', 'max:255'],
-            'country' => ['nullable', 'string', 'max:100'],
             'city' => ['nullable', 'string', 'max:100'],
         ];
 
         if ($request->role === 'employer') {
             $rules['company_name'] = ['required', 'string', 'max:255'];
-            $rules['contact_name'] = ['required', 'string', 'max:255'];
-            $rules['ruc'] = ['required', 'digits:13', 'unique:employers,ruc'];
             $rules['phone'] = ['required', 'string', 'max:50'];
             $rules['address'] = ['required', 'string', 'max:255'];
             $rules['sector'] = ['required', 'string', 'max:255'];
-            $rules['country'] = ['required', 'string', 'max:100'];
             $rules['city'] = ['required', 'string', 'max:100'];
-            // website queda como nullable
         } else {
             $rules['company_name'] = ['nullable'];
-            $rules['contact_name'] = ['nullable'];
-            $rules['ruc'] = ['nullable'];
-            $rules['phone'] = ['nullable'];
-            $rules['address'] = ['nullable'];
-            $rules['sector'] = ['nullable'];
-            $rules['country'] = ['nullable'];
-            $rules['city'] = ['nullable'];
         }
 
-
-        $messages = [
-            'ruc.unique' => 'El RUC ya está registrado. Por favor ingresa uno diferente.',
-        ];
-
-        $request->validate($rules, $messages);
+        $request->validate($rules);
 
         $user = User::create([
             'name' => $request->name,
@@ -98,19 +80,16 @@ class RegisteredUserController extends Controller
                 'portfolio_url' => null,
                 'cv_path' => null,
                 'country' => null,
-                'city' => null,
+                'city' => $request->city,
             ]);
         } elseif ($request->role === 'employer') {
             Employer::create([
                 'user_id' => $user->id,
                 'company_name' => $request->company_name,
-                'contact_name' => $request->contact_name,
-                'ruc' => $request->ruc,
                 'phone' => $request->phone,
                 'address' => $request->address,
                 'website' => $request->website,
                 'sector' => $request->sector,
-                'country' => $request->country,
                 'city' => $request->city,
                 'is_verified' => false,
             ]);
@@ -119,10 +98,6 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
         Auth::login($user);
 
-        return match ($request->role) {
-            'graduate' => redirect()->route('dashboard'),
-            'employer' => redirect()->route('dashboard'),
-            default => redirect()->route('dashboard'),
-        };
+        return redirect()->route('dashboard');
     }
 }

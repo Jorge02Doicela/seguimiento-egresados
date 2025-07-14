@@ -11,6 +11,7 @@ class Graduate extends Model
 
     protected $fillable = [
         'user_id',
+        'career_id',
         'cohort_year',
         'gender',
         'is_working',

@@ -17,6 +17,12 @@
                 <p><strong>Año de cohorte de egreso:</strong> <span
                         class="text-text-secondary">{{ $graduate->cohort_year }}</span></p>
                 <p><strong>Género:</strong> <span class="text-text-secondary">{{ $graduate->gender }}</span></p>
+                <p><strong>Carrera:</strong>
+                    <span class="text-text-secondary">
+                        {{ $graduate->career->name ?? 'No asignada' }}
+                    </span>
+                </p>
+
                 <p><strong>¿Está trabajando actualmente?</strong>
                     <span class="font-semibold {{ $graduate->is_working ? 'text-success' : 'text-error' }}">
                         {{ $graduate->is_working ? 'Sí' : 'No' }}

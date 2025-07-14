@@ -13,14 +13,11 @@ class Employer extends Model
     protected $fillable = [
         'user_id',
         'company_name',
-        'contact_name',
-        'ruc',
         'phone',
         'address',
         'company_email',    // agregado
         'website',
         'sector',
-        'country',
         'city',
         'is_verified',
     ];
