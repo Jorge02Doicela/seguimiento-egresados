@@ -12,7 +12,13 @@ class Survey extends Model
         'description',
         'is_active',
         'start_date',
-        'end_date'
+        'end_date',
+    ];
+
+    // Indicamos que estos campos son fechas y se castean a objetos Carbon automáticamente
+    protected $casts = [
+        'start_date' => 'datetime',
+        'end_date' => 'datetime',
     ];
 
     // Relación con Career (pertenece a una carrera)
@@ -25,5 +31,16 @@ class Survey extends Model
     public function questions()
     {
         return $this->hasMany(Question::class);
+    }
+
+    /**
+     * Accesor para saber si la encuesta está activa según flag y fechas.
+     */
+    public function getIsCurrentlyActiveAttribute()
+    {
+        $now = now();
+        return $this->is_active
+            && (!$this->start_date || $this->start_date <= $now)
+            && (!$this->end_date || $this->end_date >= $now);
     }
 }

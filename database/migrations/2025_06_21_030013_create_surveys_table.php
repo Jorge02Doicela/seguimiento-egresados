@@ -10,7 +10,7 @@ class CreateSurveysTable extends Migration
     {
         Schema::create('surveys', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('career_id')->constrained()->onDelete('cascade');
+            $table->foreignId('career_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('description')->nullable();
             $table->boolean('is_active')->default(false);

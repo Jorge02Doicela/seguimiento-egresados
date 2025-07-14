@@ -1,77 +1,75 @@
 @extends('layouts.admin')
 
-@section('title', 'Dashboard de Encuestas')
-
 @section('content')
-    <h1>Dashboard de Encuestas</h1>
+    <h1>Dashboard de Resultados de Encuestas</h1>
+    <div class="mb-4">
+        <a href="{{ route('admin.surveys.export.pdf', $survey) }}" class="btn btn-primary">Exportar PDF</a>
+        <a href="{{ route('admin.surveys.export.excel', $survey) }}" class="btn btn-success">Exportar Excel</a>
+    </div>
 
-    <form method="GET" action="{{ route('admin.surveys.dashboard') }}" class="row mb-4">
-        <div class="col-md-3">
-            <label for="survey_id">Encuesta</label>
-            <select name="survey_id" id="survey_id" class="form-select">
-                <option value="">Todas</option>
-                @foreach ($surveys as $survey)
-                    <option value="{{ $survey->id }}" @selected(request('survey_id') == $survey->id)>{{ $survey->title }}</option>
-                @endforeach
-            </select>
-        </div>
 
-        <div class="col-md-3">
-            <label for="career_id">Carrera</label>
-            <select name="career_id" id="career_id" class="form-select">
-                <option value="">Todas</option>
-                @foreach ($careers as $career)
-                    <option value="{{ $career->id }}" @selected(request('career_id') == $career->id)>{{ $career->name }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="col-md-3">
-            <label for="cohort_year">Cohorte</label>
-            <select name="cohort_year" id="cohort_year" class="form-select">
-                <option value="">Todas</option>
-                @foreach ($cohorts as $year)
-                    <option value="{{ $year }}" @selected(request('cohort_year') == $year)>{{ $year }}</option>
-                @endforeach
-            </select>
-        </div>
-
-        <div class="col-md-3 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-        </div>
+    <form method="GET" action="{{ route('admin.surveys.dashboard') }}" class="mb-4">
+        <label for="survey_id">Seleccione una encuesta:</label>
+        <select name="survey_id" id="survey_id" onchange="this.form.submit()">
+            @foreach ($surveys as $s)
+                <option value="{{ $s->id }}" @if ($survey && $survey->id == $s->id) selected @endif>{{ $s->title }}
+                </option>
+            @endforeach
+        </select>
     </form>
 
-    @if ($results->isEmpty())
-        <p>No hay datos para mostrar con estos filtros.</p>
-    @else
-        <table class="table table-bordered table-striped">
-            <thead>
-                <tr>
-                    <th>Pregunta</th>
-                    <th>Tipo</th>
-                    <th>Total Respuestas</th>
-                    <th>Promedio (si aplica)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($results as $row)
-                    <tr>
-                        <td>{{ $row->question_text }}</td>
-                        <td>{{ ucfirst($row->type) }}</td>
-                        <td>{{ $row->total_answers }}</td>
-                        <td>
-                            @if ($row->type === 'scale')
-                                {{ number_format($row->average_score, 2) }}
-                            @else
-                                N/A
-                            @endif
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+    @if ($survey)
+        <h2>Encuesta: {{ $survey->title }}</h2>
+        <p>{{ $survey->description }}</p>
 
-        <a href="{{ route('admin.surveys.export.excel', request()->query()) }}" class="btn btn-success">Exportar Excel</a>
-        <a href="{{ route('admin.surveys.export.pdf', request()->query()) }}" class="btn btn-danger">Exportar PDF</a>
+        <div>
+            @foreach ($results as $questionId => $data)
+                <div class="mb-5">
+                    <h4>{{ $data['question_text'] }}</h4>
+
+                    @if (in_array($data['type'], ['option', 'boolean', 'checkbox']))
+                        <canvas id="chart-{{ $questionId }}" style="max-width: 600px;"></canvas>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const ctx = document.getElementById('chart-{{ $questionId }}').getContext('2d');
+                                const chart = new Chart(ctx, {
+                                    type: 'bar',
+                                    data: {
+                                        labels: {!! json_encode(array_keys($data['results'])) !!},
+                                        datasets: [{
+                                            label: 'Cantidad de respuestas',
+                                            data: {!! json_encode(array_values($data['results'])) !!},
+                                            backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                                            borderColor: 'rgba(54, 162, 235, 1)',
+                                            borderWidth: 1
+                                        }]
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        scales: {
+                                            y: {
+                                                beginAtZero: true,
+                                                precision: 0
+                                            }
+                                        }
+                                    }
+                                });
+                            });
+                        </script>
+                    @elseif($data['type'] === 'scale')
+                        <p><strong>Promedio:</strong> {{ $data['results']['average'] }}</p>
+                        <p><strong>Total respuestas:</strong> {{ $data['results']['total_responses'] }}</p>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @else
+        <p>No se encontró ninguna encuesta.</p>
     @endif
+
+@endsection
+
+@section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 @endsection

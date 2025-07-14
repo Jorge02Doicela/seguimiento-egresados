@@ -2,46 +2,23 @@
 
 namespace App\Exports;
 
-use App\Models\Answer;
+use App\Models\Survey;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
-use Illuminate\Support\Facades\DB;
 
-class SurveyReportExport implements FromView
+class SurveyResultsExport implements FromView
 {
-    protected $filters;
+    protected $survey;
 
-    public function __construct(array $filters)
+    public function __construct(Survey $survey)
     {
-        $this->filters = $filters;
+        $this->survey = $survey;
     }
 
     public function view(): View
     {
-        $query = Answer::query()
-            ->select(
-                'questions.question_text',
-                'questions.type',
-                DB::raw('COUNT(answers.id) as total_answers'),
-                DB::raw('AVG(CAST(answers.answer_text AS UNSIGNED)) as average_score')
-            )
-            ->join('questions', 'answers.question_id', '=', 'questions.id')
-            ->join('graduates', 'answers.user_id', '=', 'graduates.user_id')
-            ->join('surveys', 'questions.survey_id', '=', 'surveys.id')
-            ->groupBy('questions.id');
+        $survey = $this->survey->load('questions.answers');
 
-        if (!empty($this->filters['survey_id'])) {
-            $query->where('surveys.id', $this->filters['survey_id']);
-        }
-        if (!empty($this->filters['career_id'])) {
-            $query->where('graduates.career_id', $this->filters['career_id']);
-        }
-        if (!empty($this->filters['cohort_year'])) {
-            $query->whereYear('graduates.graduation_date', $this->filters['cohort_year']);
-        }
-
-        $results = $query->get();
-
-        return view('admin.surveys.report_excel', compact('results'));
+        return view('admin.surveys.exports.excel', compact('survey'));
     }
 }

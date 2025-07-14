@@ -54,11 +54,23 @@ class RegisteredUserController extends Controller
             $rules['company_name'] = ['required', 'string', 'max:255'];
             $rules['contact_name'] = ['required', 'string', 'max:255'];
             $rules['ruc'] = ['required', 'digits:13', 'unique:employers,ruc'];
+            $rules['phone'] = ['required', 'string', 'max:50'];
+            $rules['address'] = ['required', 'string', 'max:255'];
+            $rules['sector'] = ['required', 'string', 'max:255'];
+            $rules['country'] = ['required', 'string', 'max:100'];
+            $rules['city'] = ['required', 'string', 'max:100'];
+            // website queda como nullable
         } else {
             $rules['company_name'] = ['nullable'];
             $rules['contact_name'] = ['nullable'];
             $rules['ruc'] = ['nullable'];
+            $rules['phone'] = ['nullable'];
+            $rules['address'] = ['nullable'];
+            $rules['sector'] = ['nullable'];
+            $rules['country'] = ['nullable'];
+            $rules['city'] = ['nullable'];
         }
+
 
         $messages = [
             'ruc.unique' => 'El RUC ya está registrado. Por favor ingresa uno diferente.',
@@ -108,8 +120,8 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         return match ($request->role) {
-            'graduate' => redirect()->route('graduate.home'),
-            'employer' => redirect()->route('employer.home'),
+            'graduate' => redirect()->route('dashboard'),
+            'employer' => redirect()->route('dashboard'),
             default => redirect()->route('dashboard'),
         };
     }

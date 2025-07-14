@@ -4,39 +4,42 @@ namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\MailMessage;  // Email (opcional)
-use App\Models\Survey;
+use Illuminate\Notifications\Messages\MailMessage;
+
 
 class NewSurveyNotification extends Notification
 {
     use Queueable;
 
-    protected $surveyTitle;
+    protected $survey;
 
-    /**
-     * Crear una nueva instancia de notificación.
-     */
-    public function __construct($surveyTitle)
+    public function __construct($survey)
     {
-        $this->surveyTitle = $surveyTitle;
+        $this->survey = $survey;
     }
 
-    /**
-     * Canales de entrega: base de datos.
-     */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database',];
     }
 
-    /**
-     * Representación para almacenamiento en base de datos.
-     */
+
     public function toDatabase($notifiable)
     {
         return [
-            'title' => 'Nueva encuesta creada',
-            'message' => "Se ha creado una nueva encuesta: {$this->surveyTitle}",
+            'survey_id' => $this->survey->id,
+            'title' => $this->survey->title,
+            'message' => 'Hay una nueva encuesta disponible para responder.',
         ];
+    }
+
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->subject('Nueva encuesta disponible')
+            ->greeting('Hola ' . $notifiable->name)
+            ->line('Tienes una nueva encuesta que responder en el sistema de Seguimiento de Egresados.')
+            ->action('Ver encuestas', url('/surveys'))
+            ->line('Gracias por tu participación.');
     }
 }

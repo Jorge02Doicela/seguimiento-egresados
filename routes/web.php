@@ -5,6 +5,7 @@ use App\Http\Controllers\GraduateProfileController;
 use App\Http\Controllers\GraduateSearchController;
 use App\Http\Controllers\Admin\SurveyController;
 use App\Http\Controllers\Graduate\SurveyResponseController;
+use App\Http\Controllers\Graduate\GeneralSurveyController; // <-- agregado aquí
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
@@ -15,8 +16,10 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\EmployerController;
 use App\Http\Controllers\Employer\ProfileController as EmployerProfileController;
-
-
+use App\Http\Controllers\Admin\SurveyPdfController;
+use App\Exports\SurveyResultsExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\Survey;
 
 /*
 |--------------------------------------------------------------------------
@@ -84,6 +87,15 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // CRUD completo encuestas
     Route::resource('surveys', SurveyController::class);
 
+    // Exportar resultados de una encuesta individual
+    Route::get('surveys/{survey}/export/pdf', [SurveyPdfController::class, 'export'])
+        ->name('surveys.export.pdf.individual');
+
+    Route::get('surveys/{survey}/export/excel', function (Survey $survey) {
+        return Excel::download(new SurveyResultsExport($survey), 'survey_results_' . $survey->id . '.xlsx');
+    })->name('surveys.export.excel.individual');
+
+
     // Exportar dashboard
     Route::get('/dashboard/export/excel', [DashboardExportController::class, 'exportExcel'])->name('dashboard.export.excel');
     Route::get('/dashboard/export/pdf', [DashboardExportController::class, 'exportPDF'])->name('dashboard.export.pdf');
@@ -111,12 +123,21 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
     Route::post('/profile/skills/add', [GraduateProfileController::class, 'addSkill'])->name('profile.skills.add');
     Route::post('/profile/skills/remove', [GraduateProfileController::class, 'removeSkill'])->name('profile.skills.remove');
 
-
     // Encuestas para responder
     Route::get('/surveys', [SurveyResponseController::class, 'index'])->name('surveys.index');
     Route::get('/surveys/{survey}', [SurveyResponseController::class, 'show'])->middleware('check.survey.access')->name('surveys.show');
-    Route::post('/surveys/{survey}/answers', [SurveyResponseController::class, 'store'])->middleware('check.survey.access')->name('surveys.answers.store');
+    Route::post('/surveys/{survey}/submit', [SurveyResponseController::class, 'submit'])->middleware('check.survey.access')->name('surveys.submit');
+
+    // Notificaciones para egresados
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+
+    // Rutas para encuestas generales (nuevas)
+    Route::get('general-surveys', [GeneralSurveyController::class, 'index'])->name('general-surveys.index');
+    Route::get('general-surveys/{survey}', [GeneralSurveyController::class, 'show'])->name('general-surveys.show');
+    Route::post('general-surveys/{survey}/submit', [GeneralSurveyController::class, 'submit'])->name('general-surveys.submit');
 });
+
 
 // Rutas exclusivas Empleadores (con middleware que restringe acceso si no están verificados)
 Route::middleware(['auth', 'role:employer', 'verified.employer'])->prefix('employer')->name('employer.')->group(function () {
@@ -135,8 +156,6 @@ Route::middleware(['auth', 'role:employer', 'verified.employer'])->prefix('emplo
     Route::get('/profile/edit', [EmployerProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [EmployerProfileController::class, 'update'])->name('profile.update');
 });
-
-
 
 
 // Rutas para mensajes y notificaciones (usuarios autenticados)

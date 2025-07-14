@@ -15,29 +15,6 @@
 
 <body class="font-body antialiased bg-bg-primary text-text-primary min-h-screen flex flex-col">
 
-    {{-- Barra de notificación si hay encuestas nuevas --}}
-    @auth
-        @if (auth()->user()->hasRole('graduate'))
-            @php
-                $unreadSurveyCount = auth()
-                    ->user()
-                    ->notifications()
-                    ->whereNull('read_at')
-                    ->where('type', 'App\Notifications\NewSurveyNotification')
-                    ->count();
-            @endphp
-
-            @if ($unreadSurveyCount > 0)
-                <div
-                    class="bg-warning text-text-inverse p-3 text-center text-sm font-semibold sticky top-0 z-sticky shadow-md">
-                    Tienes <span class="font-bold">{{ $unreadSurveyCount }}</span> notificación(es) nueva(s).
-                    <a href="{{ route('notifications.index') }}" class="underline hover:text-primary-dark ml-2">Ver
-                        notificaciones</a>
-                </div>
-            @endif
-        @endif
-    @endauth
-
     {{-- Main Navigation Bar --}}
     <nav class="bg-primary text-text-inverse shadow-lg">
         <div class="container mx-auto px-4 py-4 flex flex-wrap items-center justify-between">
@@ -61,6 +38,25 @@
                             ->whereNull('read_at')
                             ->count();
 
+                        $user = auth()->user();
+                        $careerId = $user->graduate->career_id ?? null;
+                        $pendingCount = 0;
+
+                        if ($careerId) {
+                            $pendingCount = \App\Models\Survey::where('career_id', $careerId)
+                                ->where('is_active', true)
+                                ->where(function ($query) {
+                                    $query->whereNull('start_date')->orWhere('start_date', '<=', now());
+                                })
+                                ->where(function ($query) {
+                                    $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+                                })
+                                // Encuestas que NO tienen respuestas del usuario
+                                ->whereDoesntHave('questions.answers', function ($query) use ($user) {
+                                    $query->where('user_id', $user->id);
+                                })
+                                ->count();
+                        }
                     @endphp
 
                     {{-- Enlaces de navegación autenticados --}}
@@ -73,31 +69,24 @@
                         </li>
 
                         @role('admin')
-                            <!-- Botón existente: Gestión Usuarios -->
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.users.index') }}">
                                     <i class="bi bi-people-fill mr-1"></i> Gestión Usuarios
                                 </a>
                             </li>
-
-                            <!-- Botón existente: Gestión Empleadores -->
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.employers.index') }}">
                                     <i class="bi bi-building mr-1"></i> Gestión Empleadores
                                 </a>
                             </li>
-
-                            <!-- NUEVO BOTÓN: Dashboard Admin -->
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.dashboard') }}">
                                     <i class="bi bi-speedometer2 mr-1"></i> Dashboard Admin
                                 </a>
                             </li>
-
-                            <!-- NUEVO BOTÓN: Encuestas -->
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.surveys.index') }}">
@@ -107,25 +96,23 @@
                         @endrole
 
                         @role('graduate')
+                            {{-- Enlace para encuestas específicas por carrera --}}
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('graduate.surveys.index') }}">
                                     <i class="bi bi-clipboard-check mr-1"></i> Responder Encuestas
+                                    @if ($pendingCount > 0)
+                                        <span
+                                            class="ml-1 inline-block bg-red-600 text-xs px-2 py-0.5 rounded-full">{{ $pendingCount }}</span>
+                                    @endif
                                 </a>
                             </li>
-                        @endrole
 
-                        @role('employer')
+                            {{-- Enlace para encuestas generales --}}
                             <li class="mb-2 lg:mb-0">
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('employer.profile.show') }}">
-                                    <i class="bi bi-person-circle mr-1"></i> Perfil Empresa
-                                </a>
-                            </li>
-                            <li class="mb-2 lg:mb-0">
-                                <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
-                                    href="{{ route('employer.graduates') }}">
-                                    <i class="bi bi-search mr-1"></i> Buscar egresados
+                                <a href="{{ route('graduate.general-surveys.index') }}"
+                                    class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
+                                    <i class="bi bi-list-check mr-1"></i> Encuestas Generales
                                 </a>
                             </li>
                         @endrole
@@ -140,6 +127,18 @@
                                         class="ml-1 inline-block bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
                                         {{ $unreadMessagesCount }}
                                     </span>
+                                @endif
+                            </a>
+                        </li>
+
+                        {{-- Enlace a Notificaciones --}}
+                        <li class="mb-2 lg:mb-0">
+                            <a href="{{ route('notifications.index') }}"
+                                class="relative block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
+                                <i class="bi bi-bell-fill mr-1"></i> Notificaciones
+                                @if (Auth::user()->unreadNotifications->count())
+                                    <span
+                                        class="absolute top-2 right-2 inline-block w-2 h-2 bg-red-600 rounded-full"></span>
                                 @endif
                             </a>
                         </li>
@@ -164,7 +163,6 @@
                                 </a>
                             </li>
                         @endrole
-
 
                         <li class="mb-2 lg:mb-0">
                             <form method="POST" action="{{ route('logout') }}">
@@ -194,7 +192,6 @@
                     </ul>
                 @endauth
             </div>
-        </div>
         </div>
     </nav>
 

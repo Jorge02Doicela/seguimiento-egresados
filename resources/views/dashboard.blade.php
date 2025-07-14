@@ -119,6 +119,29 @@
                     <h1
                         class="text-center mb-12 text-primary font-headings text-4xl lg:text-5xl font-extrabold animate-fade-in-down">
                         Bienvenido, Empleador</h1>
+                    {{-- Notificaciones recientes del egresado --}}
+                    <div class="bg-white border border-primary-lightest rounded-lg shadow-md p-6 w-full animate-fade-in mb-12">
+                        <h2 class="text-xl font-bold text-primary mb-4">
+                            <i class="bi bi-bell-fill text-secondary mr-2"></i>Notificaciones Recientes
+                        </h2>
+
+                        @forelse(auth()->user()->notifications as $notification)
+                            <div class="p-4 mb-3 border-l-4 border-secondary bg-secondary-lightest rounded">
+                                <strong class="block text-primary-dark text-base font-semibold">
+                                    {{ $notification->data['title'] ?? 'Nueva notificación' }}
+                                </strong>
+                                <span class="text-text-light text-sm">
+                                    {{ $notification->data['message'] ?? '...' }}
+                                </span>
+                                <div class="text-right text-xs text-gray-500 mt-1">
+                                    {{ $notification->created_at->diffForHumans() }}
+                                </div>
+                            </div>
+                        @empty
+                            <p class="text-text-light text-sm italic">Aún no tienes notificaciones nuevas.</p>
+                        @endforelse
+                    </div>
+
                     <div
                         class="card max-w-4xl mx-auto mb-16 flex flex-col overflow-hidden animate-fade-in border border-primary-lightest">
                         {{-- Aplicado .card, Borde sutil añadido --}}

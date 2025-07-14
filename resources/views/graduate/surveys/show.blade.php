@@ -1,63 +1,58 @@
 @extends('layouts.app')
 
-@section('title', 'Responder Encuesta')
-
 @section('content')
-    <h2>{{ $survey->title }}</h2>
-    <p>{{ $survey->description }}</p>
+    <h1>{{ $survey->title }}</h1>
 
-    <form method="POST" action="{{ route('graduate.surveys.answers.store', $survey) }}">
-        @csrf
+    @if ($hasAnswered)
+        <div class="alert alert-info">Ya has respondido esta encuesta.</div>
+        <a href="{{ route('graduate.surveys.index') }}" class="btn btn-secondary">Volver a encuestas</a>
+    @else
+        <form action="{{ route('graduate.surveys.submit', $survey) }}" method="POST">
+            @csrf
+            @foreach ($survey->questions as $question)
+                <div class="mb-4">
+                    <label class="form-label"><strong>{{ $question->question_text }}</strong></label><br>
 
-        @foreach ($survey->questions as $question)
-            <div class="mb-4">
-                <label class="form-label fw-bold">{{ $question->question_text }}</label>
-
-                @php
-                    $options = $question->options ? json_decode($question->options, true) : [];
-                @endphp
-
-                @if ($question->type === 'option')
-                    {{-- Opción múltiple (radio buttons) --}}
-                    @foreach ($options as $option)
-                        <div class="form-check">
-                            <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}"
-                                class="form-check-input" required>
-                            <label class="form-check-label">{{ $option }}</label>
+                    @if ($question->type === 'option')
+                        @foreach (json_decode($question->options) as $option)
+                            <div>
+                                <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" required>
+                                <label>{{ $option }}</label>
+                            </div>
+                        @endforeach
+                    @elseif($question->type === 'checkbox')
+                        @foreach (json_decode($question->options) as $option)
+                            <div>
+                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}"
+                                    required>
+                                <label>{{ $option }}</label>
+                            </div>
+                        @endforeach
+                    @elseif($question->type === 'scale')
+                        <select name="answers[{{ $question->id }}]" required>
+                            <option value="">Seleccione</option>
+                            @for ($i = $question->scale_min; $i <= $question->scale_max; $i++)
+                                <option value="{{ $i }}">{{ $i }}</option>
+                            @endfor
+                        </select>
+                    @elseif($question->type === 'boolean')
+                        <div>
+                            <input type="radio" name="answers[{{ $question->id }}]" value="Sí" required>
+                            <label>Sí</label>
                         </div>
-                    @endforeach
-                @elseif ($question->type === 'checkbox')
-                    {{-- Selección múltiple (checkboxes) --}}
-                    @foreach ($options as $option)
-                        <div class="form-check">
-                            <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}"
-                                class="form-check-input">
-                            <label class="form-check-label">{{ $option }}</label>
+                        <div>
+                            <input type="radio" name="answers[{{ $question->id }}]" value="No" required>
+                            <label>No</label>
                         </div>
-                    @endforeach
-                @elseif ($question->type === 'scale')
-                    {{-- Escala numérica --}}
-                    <select name="answers[{{ $question->id }}]" class="form-select" required>
-                        <option value="">Seleccione</option>
-                        @for ($i = $question->scale_min ?? 1; $i <= ($question->scale_max ?? 5); $i++)
-                            <option value="{{ $i }}">{{ $i }}</option>
-                        @endfor
-                    </select>
-                @elseif ($question->type === 'boolean')
-                    {{-- Sí/No --}}
-                    <select name="answers[{{ $question->id }}]" class="form-select" required>
-                        <option value="">Seleccione</option>
-                        <option value="Sí">Sí</option>
-                        <option value="No">No</option>
-                    </select>
-                @endif
+                    @endif
 
-                @error('answers.' . $question->id)
-                    <small class="text-danger">{{ $message }}</small>
-                @enderror
-            </div>
-        @endforeach
+                    @error('answers.' . $question->id)
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+            @endforeach
 
-        <button type="submit" class="btn btn-primary">Enviar respuestas</button>
-    </form>
+            <button type="submit" class="btn btn-success">Enviar respuestas</button>
+        </form>
+    @endif
 @endsection
