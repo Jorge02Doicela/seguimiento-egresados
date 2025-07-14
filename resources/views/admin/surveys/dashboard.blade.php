@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
     <h1>Dashboard de Resultados de Encuestas</h1>

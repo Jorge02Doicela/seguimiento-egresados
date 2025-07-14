@@ -29,10 +29,6 @@
                     <td class="border border-gray-300 px-4 py-2">{{ $employer->sector ?? '-' }}</td>
                 </tr>
                 <tr>
-                    <th class="border border-gray-300 px-4 py-2 text-left">País</th>
-                    <td class="border border-gray-300 px-4 py-2">{{ $employer->country ?? '-' }}</td>
-                </tr>
-                <tr>
                     <th class="border border-gray-300 px-4 py-2 text-left">Ciudad</th>
                     <td class="border border-gray-300 px-4 py-2">{{ $employer->city ?? '-' }}</td>
                 </tr>
