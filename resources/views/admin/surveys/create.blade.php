@@ -42,12 +42,14 @@
         <div>
             <label for="career_id" class="block mb-2 font-semibold">Carrera</label>
             <select name="career_id" id="career_id" required class="w-full border border-gray-300 rounded px-3 py-2">
-                <option value="" {{ old('career_id') === null ? 'selected' : '' }}>General</option>
                 @foreach ($careers as $career)
-                    <option value="{{ $career->id }}" {{ old('career_id') == $career->id ? 'selected' : '' }}>
-                        {{ $career->name }}
-                    </option>
+                    @if ($career->name !== 'General')
+                        <option value="{{ $career->id }}" {{ old('career_id') == $career->id ? 'selected' : '' }}>
+                            {{ $career->name }}
+                        </option>
+                    @endif
                 @endforeach
+
             </select>
             @error('career_id')
                 <p class="text-red-600 text-sm mt-1">{{ $message }}</p>

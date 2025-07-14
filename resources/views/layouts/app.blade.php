@@ -107,15 +107,24 @@
                                     @endif
                                 </a>
                             </li>
-
-                            {{-- Enlace para encuestas generales --}}
+                        @endrole
+                        @role('employer')
                             <li class="mb-2 lg:mb-0">
-                                <a href="{{ route('graduate.general-surveys.index') }}"
+                                <a href="{{ route('employer.graduates') }}"
                                     class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
-                                    <i class="bi bi-list-check mr-1"></i> Encuestas Generales
+                                    <i class="bi bi-search mr-1"></i> Buscar Egresados
                                 </a>
                             </li>
                         @endrole
+                        @role('employer')
+                            <li class="mb-2 lg:mb-0">
+                                <a href="{{ route('employer.profile.show') }}"
+                                    class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
+                                    <i class="bi bi-person-fill mr-1"></i> Perfil Empleador
+                                </a>
+                            </li>
+                        @endrole
+
 
                         {{-- Enlace a Mensajes --}}
                         <li class="mb-2 lg:mb-0">

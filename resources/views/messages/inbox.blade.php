@@ -10,11 +10,19 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <div class="mb-3">
+        <div class="mb-3 d-flex gap-2">
             <a href="{{ route('messages.create') }}" class="btn btn-primary">
                 <i class="bi bi-pencil-square"></i> Nuevo Mensaje
             </a>
+
+            @role('admin')
+                <a href="{{ route('admin.messages.broadcast') }}" class="btn btn-warning">
+                    <i class="bi bi-megaphone-fill"></i> Mensaje Masivo
+                </a>
+            @endrole
+
         </div>
+
 
         @if ($messages->isEmpty())
             <div class="alert alert-info">No tienes mensajes.</div>

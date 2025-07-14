@@ -16,10 +16,7 @@
                             <h2 class="text-sm font-medium text-gray-500">Nombre de la empresa</h2>
                             <p class="text-lg font-semibold">{{ $employer->company_name }}</p>
                         </div>
-                        <div>
-                            <h2 class="text-sm font-medium text-gray-500">Representante</h2>
-                            <p class="text-lg font-semibold">{{ $employer->contact_name }}</p>
-                        </div>
+
                         <div>
                             <h2 class="text-sm font-medium text-gray-500">Correo de empresa</h2>
                             <p>{{ $employer->company_email ?? 'No especificado' }}</p>
@@ -42,18 +39,12 @@
                             <h2 class="text-sm font-medium text-gray-500">Sector</h2>
                             <p>{{ $employer->sector ?? 'No especificado' }}</p>
                         </div>
-                        <div>
-                            <h2 class="text-sm font-medium text-gray-500">País</h2>
-                            <p>{{ $employer->country ?? 'No especificado' }}</p>
-                        </div>
+
                         <div>
                             <h2 class="text-sm font-medium text-gray-500">Ciudad</h2>
                             <p>{{ $employer->city ?? 'No especificado' }}</p>
                         </div>
-                        <div class="md:col-span-2">
-                            <h2 class="text-sm font-medium text-gray-500">Dirección</h2>
-                            <p>{{ $employer->address ?? 'No especificado' }}</p>
-                        </div>
+
                     </div>
                 </div>
             </div>

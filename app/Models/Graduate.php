@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Crypt;
 
 class Graduate extends Model
 {
@@ -23,7 +25,6 @@ class Graduate extends Model
         'cv_path',
         'country',
         'city',
-
     ];
 
     // Relación con User
@@ -41,5 +42,14 @@ class Graduate extends Model
     public function career()
     {
         return $this->belongsTo(Career::class);
+    }
+
+    // Encriptar y desencriptar salary
+    protected function salary(): Attribute
+    {
+        return Attribute::make(
+            get: fn($value) => $value ? Crypt::decryptString($value) : null,
+            set: fn($value) => $value ? Crypt::encryptString($value) : null,
+        );
     }
 }

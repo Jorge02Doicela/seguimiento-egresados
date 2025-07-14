@@ -154,4 +154,53 @@ class MessageController extends Controller
             'Content-Disposition' => 'inline; filename="' . $fileName . '"',
         ]);
     }
+
+    public function broadcast(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user->hasRole('admin')) {
+            abort(403, 'Acceso no autorizado');
+        }
+
+        if ($request->isMethod('post')) {
+            $request->validate([
+                'content' => 'nullable|string|max:1000',
+                'force_update' => 'nullable|boolean',
+            ]);
+
+            // Validación manual para que al menos uno esté presente
+            if (!$request->filled('content') && !$request->boolean('force_update')) {
+                return back()->withErrors(['content' => 'Debes escribir un mensaje o solicitar actualización de perfil.'])->withInput();
+            }
+
+            $baseMessage = $request->input('content', '');
+            if ($request->boolean('force_update')) {
+                $extraText = "\n\nPor favor, actualiza tu perfil accediendo a tu cuenta. Es importante mantener tus datos actualizados para el seguimiento institucional.";
+                $baseMessage .= $extraText;
+            }
+
+            $recipients = \App\Models\User::whereHas('roles', function ($q) {
+                $q->whereIn('name', ['graduate', 'employer']);
+            })->get();
+
+            foreach ($recipients as $recipient) {
+                Message::create([
+                    'sender_id' => $user->id,
+                    'recipient_id' => $recipient->id,
+                    'content' => $baseMessage,
+                    'read_at' => null,
+                ]);
+
+                // Enviar notificación si se solicitó actualización (opcional)
+                if ($request->boolean('force_update')) {
+                    $recipient->notify(new \App\Notifications\UpdateProfileNotification());
+                }
+            }
+
+            return redirect()->route('messages.inbox')->with('success', 'Mensaje masivo enviado correctamente.');
+        }
+
+        return view('messages.broadcast');
+    }
 }

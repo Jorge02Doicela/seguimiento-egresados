@@ -109,6 +109,9 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Ruta para verificar / desverificar empleadores
     Route::patch('employers/{employer}/verify', [EmployerController::class, 'verify'])->name('employers.verify');
 
+    // Enviar mensajes masivos (broadcast)
+    Route::match(['get', 'post'], '/messages/broadcast', [MessageController::class, 'broadcast'])->name('messages.broadcast');
+
     // Otras rutas admin
     Route::patch('users/{user}/toggle-block', [UserController::class, 'toggleBlock'])->name('users.toggle-block');
 });

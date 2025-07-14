@@ -32,15 +32,7 @@
                             required>
                     </div>
 
-                    {{-- Contact Name --}}
-                    <div>
-                        <label for="contact_name" class="block text-sm font-medium text-gray-700">Nombre del
-                            representante</label>
-                        <input type="text" id="contact_name" name="contact_name"
-                            value="{{ old('contact_name', $employer->contact_name) }}"
-                            class="mt-1 block w-full rounded-md shadow-sm border-gray-300 focus:ring-primary focus:border-primary"
-                            required>
-                    </div>
+
 
                     {{-- Phone --}}
                     <div>
@@ -71,12 +63,6 @@
                             class="mt-1 block w-full rounded-md shadow-sm border-gray-300 focus:ring-primary focus:border-primary">
                     </div>
 
-                    {{-- Country --}}
-                    <div>
-                        <label for="country" class="block text-sm font-medium text-gray-700">País</label>
-                        <input type="text" id="country" name="country" value="{{ old('country', $employer->country) }}"
-                            class="mt-1 block w-full rounded-md shadow-sm border-gray-300 focus:ring-primary focus:border-primary">
-                    </div>
 
                     {{-- City --}}
                     <div>
@@ -85,13 +71,7 @@
                             class="mt-1 block w-full rounded-md shadow-sm border-gray-300 focus:ring-primary focus:border-primary">
                     </div>
 
-                    {{-- Address (span full width) --}}
-                    <div class="md:col-span-2">
-                        <label for="address" class="block text-sm font-medium text-gray-700">Dirección</label>
-                        <input type="text" id="address" name="address"
-                            value="{{ old('address', $employer->address) }}"
-                            class="mt-1 block w-full rounded-md shadow-sm border-gray-300 focus:ring-primary focus:border-primary">
-                    </div>
+
                 </div>
 
 

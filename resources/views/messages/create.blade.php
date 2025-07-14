@@ -38,15 +38,7 @@
                 <div class="form-text">Máximo 1000 caracteres.</div>
             </div>
 
-            <div class="mb-3">
-                <label for="attachment" class="form-label">Adjuntar archivo (opcional)</label>
-                <input type="file" name="attachment" id="attachment" class="form-control"
-                    accept=".jpg,.jpeg,.png,.pdf,.doc,.docx,.xls,.xlsx,.txt,.pptx">
-                @error('attachment')
-                    <div class="text-danger mt-1">{{ $message }}</div>
-                @enderror
-                <div class="form-text">Formatos permitidos: jpg, jpeg, png, pdf, doc, docx, xls, xlsx, txt.</div>
-            </div>
+
 
             <button type="submit" class="btn btn-success">
                 <i class="bi bi-send-fill"></i> Enviar Mensaje
