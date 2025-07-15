@@ -52,7 +52,7 @@ class SurveyController extends Controller
 
         foreach ($request->questions as $q) {
             $options = null;
-            if (in_array($q['type'], ['option', 'checkbox'])) {
+            if ($q['type'] === 'checkbox') {
                 $opts = array_map('trim', explode(',', $q['options'] ?? ''));
                 $options = json_encode($opts);
             }
@@ -80,8 +80,21 @@ class SurveyController extends Controller
     {
         $careers = Career::all();
         $survey->load('questions');
-        return view('admin.surveys.edit', compact('survey', 'careers'));
+
+        $questionsData = $survey->questions->map(function ($q) {
+            return [
+                'id' => $q->id,
+                'text' => $q->question_text,
+                'type' => $q->type,
+                'options' => $q->options ? json_decode($q->options) : [],
+                'scale_min' => $q->scale_min,
+                'scale_max' => $q->scale_max,
+            ];
+        })->toArray();
+
+        return view('admin.surveys.edit', compact('survey', 'careers', 'questionsData'));
     }
+
 
     public function update(Request $request, Survey $survey)
     {
@@ -94,7 +107,7 @@ class SurveyController extends Controller
             'questions' => 'required|array|min:1',
             'questions.*.id' => 'nullable|exists:questions,id',
             'questions.*.text' => 'required|string',
-            'questions.*.type' => 'required|in:option,checkbox,scale,boolean',
+            'questions.*.type' => 'required|in:checkbox,scale,boolean',
             'questions.*.options' => 'nullable|string',
             'questions.*.scale_min' => 'nullable|integer',
             'questions.*.scale_max' => 'nullable|integer',
@@ -114,7 +127,7 @@ class SurveyController extends Controller
 
         foreach ($request->questions as $q) {
             $options = null;
-            if (in_array($q['type'], ['option', 'checkbox'])) {
+            if ($q['type'] === 'checkbox') {
                 $opts = array_map('trim', explode(',', $q['options'] ?? ''));
                 $options = json_encode($opts);
             }

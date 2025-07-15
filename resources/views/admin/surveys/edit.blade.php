@@ -72,69 +72,81 @@
         <button type="submit" class="btn btn-primary">Actualizar Encuesta</button>
     </form>
 
-    <script>
-        let questionCount = 0;
-        const questions = @json(old(
-                'questions',
-                $survey->questions->map(function ($q) {
+    @php
+        $questionsData = old(
+            'questions',
+            $survey->questions
+                ->map(function ($q) {
                     return [
                         'id' => $q->id,
                         'text' => $q->question_text,
                         'type' => $q->type,
-                        'options' => $q->options ? implode(',', json_decode($q->options)) : '',
+                        'options' => $q->options ? json_decode($q->options) : [],
                         'scale_min' => $q->scale_min,
                         'scale_max' => $q->scale_max,
                     ];
-                })));
+                })
+                ->toArray(),
+        );
+    @endphp
+
+    <script>
+        let questionCount = 0;
+        const questions = @json($questionsData);
 
         function addQuestion(data = null) {
             const container = document.getElementById('questions-container');
             const div = document.createElement('div');
             div.classList.add('mb-4', 'border', 'p-4', 'rounded', 'bg-gray-50');
 
-            let optionsHTML = '';
-            let scaleHTML = '';
-
-            if (data) {
-                optionsHTML = (data.type === 'option' || data.type === 'checkbox') ? `
-            <label>Opciones (separadas por coma)</label>
-            <textarea name="questions[${questionCount}][options]" class="input">${data.options}</textarea>
-        ` : '';
-
-                scaleHTML = (data.type === 'scale') ? `
-            <label>Escala mínima</label>
-            <input type="number" name="questions[${questionCount}][scale_min]" value="${data.scale_min || 1}" class="input" />
-            <label>Escala máxima</label>
-            <input type="number" name="questions[${questionCount}][scale_max]" value="${data.scale_max || 5}" class="input" />
-        ` : '';
+            let optionsText = '';
+            if (data && (data.type === 'option' || data.type === 'checkbox')) {
+                if (Array.isArray(data.options)) {
+                    optionsText = data.options.join(', ');
+                } else if (typeof data.options === 'string') {
+                    optionsText = data.options;
+                }
             }
 
+            let optionsHTML = (data && (data.type === 'option' || data.type === 'checkbox')) ? `
+                <label>Opciones (separadas por coma)</label>
+                <textarea name="questions[${questionCount}][options]" class="input">${optionsText}</textarea>
+            ` : '';
+
+            let scaleHTML = (data && data.type === 'scale') ? `
+                <label>Escala mínima</label>
+                <input type="number" name="questions[${questionCount}][scale_min]" value="${data.scale_min || 1}" class="input" />
+                <label>Escala máxima</label>
+                <input type="number" name="questions[${questionCount}][scale_max]" value="${data.scale_max || 5}" class="input" />
+            ` : '';
+
             div.innerHTML = `
-        <input type="hidden" name="questions[${questionCount}][id]" value="${data?.id ?? ''}">
-        <label>Texto de la pregunta <span class="text-red-600">*</span></label>
-        <input type="text" name="questions[${questionCount}][text]" value="${data?.text ?? ''}" required class="input mb-2" />
+                <input type="hidden" name="questions[${questionCount}][id]" value="${data?.id ?? ''}">
+                <label>Texto de la pregunta <span class="text-red-600">*</span></label>
+                <input type="text" name="questions[${questionCount}][text]" value="${data?.text ?? ''}" required class="input mb-2" />
 
-        <label>Tipo de pregunta <span class="text-red-600">*</span></label>
-        <select name="questions[${questionCount}][type]" onchange="toggleFields(this, ${questionCount})" required class="input mb-2">
-            <option value="option" ${data?.type === 'option' ? 'selected' : ''}>Opción única</option>
-            <option value="checkbox" ${data?.type === 'checkbox' ? 'selected' : ''}>Selección múltiple</option>
-            <option value="scale" ${data?.type === 'scale' ? 'selected' : ''}>Escala (1-5)</option>
-            <option value="boolean" ${data?.type === 'boolean' ? 'selected' : ''}>Sí / No</option>
-        </select>
+                <label>Tipo de pregunta <span class="text-red-600">*</span></label>
+                <select name="questions[${questionCount}][type]" onchange="toggleFields(this, ${questionCount})" required class="input mb-2">
+                    <option value="checkbox" ${data?.type === 'checkbox' ? 'selected' : ''}>Selección múltiple</option>
+                    <option value="scale" ${data?.type === 'scale' ? 'selected' : ''}>Escala (1-5)</option>
+                    <option value="boolean" ${data?.type === 'boolean' ? 'selected' : ''}>Sí / No</option>
+                </select>
 
-        <div id="options-${questionCount}" class="mb-2" style="display:none;">
-            ${optionsHTML}
-        </div>
+                <div id="options-${questionCount}" class="mb-2" style="display:none;">
+                    ${optionsHTML}
+                </div>
 
-        <div id="scale-${questionCount}" class="mb-2" style="display:none;">
-            ${scaleHTML}
-        </div>
+                <div id="scale-${questionCount}" class="mb-2" style="display:none;">
+                    ${scaleHTML}
+                </div>
 
-        <button type="button" onclick="this.parentElement.remove()" class="btn btn-danger mt-2">Eliminar Pregunta</button>
-    `;
+                <button type="button" onclick="this.parentElement.remove()" class="btn btn-danger mt-2">Eliminar Pregunta</button>
+            `;
+
             container.appendChild(div);
 
             toggleFields(div.querySelector('select'), questionCount);
+
             questionCount++;
         }
 
@@ -142,8 +154,8 @@
         questions.forEach(q => addQuestion(q));
 
         function toggleFields(select, id) {
-            document.getElementById(`options-${id}`).style.display = (select.value === 'option' || select.value ===
-                'checkbox') ? 'block' : 'none';
+            document.getElementById(`options-${id}`).style.display = (select.value === 'checkbox') ? 'block' : 'none';
+
             document.getElementById(`scale-${id}`).style.display = select.value === 'scale' ? 'block' : 'none';
         }
     </script>

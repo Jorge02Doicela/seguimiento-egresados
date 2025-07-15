@@ -127,10 +127,16 @@
 
 
                         {{-- Enlace a Mensajes --}}
+                        {{-- Enlace a Mensajes --}}
                         <li class="mb-2 lg:mb-0">
                             <a href="{{ route('messages.inbox') }}"
                                 class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
-                                <i class="bi bi-chat-left-text-fill mr-1"></i> Mensajes
+                                <i class="bi bi-chat-left-text-fill mr-1"></i>
+                                @role('admin')
+                                    Mensajes y Notificaciones
+                                @else
+                                    Mensajes
+                                @endrole
                                 @if ($unreadMessagesCount > 0)
                                     <span
                                         class="ml-1 inline-block bg-red-600 text-white text-xs font-semibold px-2 py-0.5 rounded-full">
@@ -140,17 +146,22 @@
                             </a>
                         </li>
 
+
                         {{-- Enlace a Notificaciones --}}
-                        <li class="mb-2 lg:mb-0">
-                            <a href="{{ route('notifications.index') }}"
-                                class="relative block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
-                                <i class="bi bi-bell-fill mr-1"></i> Notificaciones
-                                @if (Auth::user()->unreadNotifications->count())
-                                    <span
-                                        class="absolute top-2 right-2 inline-block w-2 h-2 bg-red-600 rounded-full"></span>
-                                @endif
-                            </a>
-                        </li>
+                        @unlessrole('admin')
+                            {{-- Enlace a Notificaciones --}}
+                            <li class="mb-2 lg:mb-0">
+                                <a href="{{ route('notifications.index') }}"
+                                    class="relative block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
+                                    <i class="bi bi-bell-fill mr-1"></i> Notificaciones
+                                    @if (Auth::user()->unreadNotifications->count())
+                                        <span
+                                            class="absolute top-2 right-2 inline-block w-2 h-2 bg-red-600 rounded-full"></span>
+                                    @endif
+                                </a>
+                            </li>
+                        @endunlessrole
+
                     </ul>
 
                     {{-- Enlaces del lado derecho --}}

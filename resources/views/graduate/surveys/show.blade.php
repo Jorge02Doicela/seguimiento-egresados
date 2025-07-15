@@ -9,6 +9,7 @@
     @else
         <form action="{{ route('graduate.surveys.submit', $survey) }}" method="POST">
             @csrf
+
             @foreach ($survey->questions as $question)
                 <div class="mb-4">
                     <label class="form-label"><strong>{{ $question->question_text }}</strong></label><br>
@@ -20,22 +21,21 @@
                                 <label>{{ $option }}</label>
                             </div>
                         @endforeach
-                    @elseif($question->type === 'checkbox')
+                    @elseif ($question->type === 'checkbox')
                         @foreach (json_decode($question->options) as $option)
                             <div>
-                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}"
-                                    required>
+                                <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}">
                                 <label>{{ $option }}</label>
                             </div>
                         @endforeach
-                    @elseif($question->type === 'scale')
+                    @elseif ($question->type === 'scale')
                         <select name="answers[{{ $question->id }}]" required>
                             <option value="">Seleccione</option>
                             @for ($i = $question->scale_min; $i <= $question->scale_max; $i++)
                                 <option value="{{ $i }}">{{ $i }}</option>
                             @endfor
                         </select>
-                    @elseif($question->type === 'boolean')
+                    @elseif ($question->type === 'boolean')
                         <div>
                             <input type="radio" name="answers[{{ $question->id }}]" value="Sí" required>
                             <label>Sí</label>
@@ -47,7 +47,7 @@
                     @endif
 
                     @error('answers.' . $question->id)
-                        <div class="text-danger">{{ $message }}</div>
+                        <div class="text-danger mt-1">{{ $message }}</div>
                     @enderror
                 </div>
             @endforeach

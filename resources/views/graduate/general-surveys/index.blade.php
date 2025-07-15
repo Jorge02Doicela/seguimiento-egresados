@@ -20,9 +20,10 @@
             <div class="p-4 border rounded mb-4 shadow-sm">
                 <h3 class="text-lg font-semibold mb-1">{{ $survey->title }}</h3>
 
-                @if ($survey->career_id == 0)
+                @if ($survey->career_id === ($generalCareer->id ?? null))
                     <span class="inline-block bg-blue-600 text-white text-xs px-2 py-1 rounded mb-2">General</span>
                 @endif
+
 
                 @if ($survey->description)
                     <p class="mb-2">{{ $survey->description }}</p>

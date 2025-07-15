@@ -19,34 +19,29 @@ class SurveyResponseController extends Controller
      */
     public function index()
     {
-        // Marcar notificaciones como leídas
         Auth::user()->unreadNotifications->markAsRead();
 
         $graduate = Auth::user()->graduate;
         $careerId = $graduate->career_id;
 
-        // Buscar ID de la carrera General si existe
         $generalCareer = Career::where('name', 'General')->first();
 
-        $surveyQuery = Survey::query()
-            ->where('is_active', true)
+        $careerIds = [$careerId];
+        if ($generalCareer) {
+            $careerIds[] = $generalCareer->id;
+        }
+
+        $surveys = Survey::where('is_active', true)
             ->where(function ($q) {
                 $q->whereNull('start_date')->orWhere('start_date', '<=', now());
             })
             ->where(function ($q) {
                 $q->whereNull('end_date')->orWhere('end_date', '>=', now());
             })
-            ->where(function ($query) use ($careerId, $generalCareer) {
-                $query->where('career_id', $careerId);
+            ->whereIn('career_id', $careerIds)
+            ->get();
 
-                if ($generalCareer) {
-                    $query->orWhere('career_id', $generalCareer->id);
-                }
-            });
-
-        $surveys = $surveyQuery->get();
-
-        return view('graduate.surveys.index', compact('surveys'));
+        return view('graduate.surveys.index', compact('surveys', 'generalCareer'));
     }
 
     /**
@@ -95,12 +90,22 @@ class SurveyResponseController extends Controller
 
         $questions = $survey->questions;
         $rules = [];
+        $messages = [];
 
         foreach ($questions as $question) {
-            $rules['answers.' . $question->id] = 'required';
+            $field = 'answers.' . $question->id;
+
+            if ($question->type === 'checkbox') {
+                $rules[$field] = 'required|array|min:1';
+                $messages[$field . '.required'] = 'Debe seleccionar al menos una opción para la pregunta: "' . $question->question_text . '"';
+                $messages[$field . '.min'] = 'Debe seleccionar al menos una opción para la pregunta: "' . $question->question_text . '"';
+            } else {
+                $rules[$field] = 'required';
+                $messages[$field . '.required'] = 'Debe responder la pregunta: "' . $question->question_text . '"';
+            }
         }
 
-        $validated = $request->validate($rules);
+        $validated = $request->validate($rules, $messages);
 
         foreach ($validated['answers'] as $questionId => $answerValue) {
             Answer::create([

@@ -78,7 +78,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     // Dashboard y exportaciones para encuestas
     Route::get('surveys/dashboard', [SurveyDashboardController::class, 'index'])->name('surveys.dashboard');
     Route::get('surveys/dashboard/charts', [SurveyDashboardController::class, 'charts'])->name('surveys.dashboard.charts');
-    Route::get('surveys/export/excel', [SurveyDashboardController::class, 'exportExcel'])->name('surveys.export.excel');
+    Route::get('surveys/export/excel/{survey}', [SurveyDashboardController::class, 'exportExcel'])->name('surveys.export.excel');
     Route::get('surveys/export/pdf', [SurveyDashboardController::class, 'exportPDF'])->name('surveys.export.pdf');
 
     // Operación especial: clonar encuesta

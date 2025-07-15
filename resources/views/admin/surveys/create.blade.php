@@ -26,17 +26,11 @@
         <div>
             <label>Título <span class="text-red-600">*</span></label>
             <input type="text" name="title" value="{{ old('title') }}" required class="input" />
-            @error('title')
-                <p class="text-red-600">{{ $message }}</p>
-            @enderror
         </div>
 
         <div>
             <label>Descripción</label>
             <textarea name="description" class="input">{{ old('description') }}</textarea>
-            @error('description')
-                <p class="text-red-600">{{ $message }}</p>
-            @enderror
         </div>
 
         <div>
@@ -49,11 +43,7 @@
                         </option>
                     @endif
                 @endforeach
-
             </select>
-            @error('career_id')
-                <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
-            @enderror
         </div>
 
         <div>
@@ -63,17 +53,11 @@
         <div>
             <label>Fecha Inicio</label>
             <input type="date" name="start_date" value="{{ old('start_date') }}" class="input" />
-            @error('start_date')
-                <p class="text-red-600">{{ $message }}</p>
-            @enderror
         </div>
 
         <div>
             <label>Fecha Fin</label>
             <input type="date" name="end_date" value="{{ old('end_date') }}" class="input" />
-            @error('end_date')
-                <p class="text-red-600">{{ $message }}</p>
-            @enderror
         </div>
 
         <hr class="my-4" />
@@ -99,8 +83,7 @@
 
                 <label>Tipo de pregunta <span class="text-red-600">*</span></label>
                 <select name="questions[${questionCount}][type]" onchange="toggleFields(this, ${questionCount})" required class="input mb-2">
-                    <option value="option">Opción única</option>
-                    <option value="checkbox">Selección múltiple</option>
+                    <option value="checkbox" selected>Selección múltiple</option>
                     <option value="scale">Escala (1-5)</option>
                     <option value="boolean">Sí / No</option>
                 </select>
@@ -120,13 +103,17 @@
                 <button type="button" onclick="this.parentElement.remove()" class="btn btn-danger mt-2">Eliminar Pregunta</button>
             `;
             container.appendChild(div);
+
+            // Forzar mostrar campos correctos según tipo por defecto
+            const selectElement = div.querySelector('select');
+            toggleFields(selectElement, questionCount);
+
             questionCount++;
         }
 
         function toggleFields(select, id) {
-            document.getElementById(`options-${id}`).style.display = (select.value === 'option' || select.value ===
-                'checkbox') ? 'block' : 'none';
-            document.getElementById(`scale-${id}`).style.display = select.value === 'scale' ? 'block' : 'none';
+            document.getElementById(`options-${id}`).style.display = (select.value === 'checkbox') ? 'block' : 'none';
+            document.getElementById(`scale-${id}`).style.display = (select.value === 'scale') ? 'block' : 'none';
         }
     </script>
 @endsection
