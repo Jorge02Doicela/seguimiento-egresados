@@ -3,12 +3,12 @@
 @section('title', 'Editar Usuario')
 
 @section('content')
-    <div class="container py-4">
-        <h1>Editar Usuario: {{ $user->name }}</h1>
+    <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-text-primary mb-6">Editar Usuario: {{ $user->name }}</h1>
 
         @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
+            <div class="bg-error-lighter text-error px-4 py-3 rounded-lg mb-6 shadow-sm" role="alert">
+                <ul class="mb-0 list-disc list-inside">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -16,68 +16,76 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.users.update', $user) }}" method="POST">
+        <form action="{{ route('admin.users.update', $user) }}" method="POST"
+            class="bg-white p-8 rounded-2xl shadow-primary-lg max-w-2xl mx-auto">
             @csrf
             @method('PUT')
 
-            <div class="mb-3">
-                <label for="name" class="form-label">Nombre</label>
-                <input type="text" name="name" id="name" class="form-control"
+            <div class="mb-5">
+                <label for="name" class="block text-text-secondary text-sm font-medium mb-1">Nombre</label>
+                <input type="text" name="name" id="name" class="form-input"
                     value="{{ old('name', $user->name) }}" required>
                 @error('name')
-                    <small class="text-danger">{{ $message }}</small>
+                    <small class="text-error text-xs mt-1">{{ $message }}</small>
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label for="email" class="form-label">Correo Electrónico</label>
-                <input type="email" name="email" id="email" class="form-control"
+            <div class="mb-5">
+                <label for="email" class="block text-text-secondary text-sm font-medium mb-1">Correo Electrónico</label>
+                <input type="email" name="email" id="email" class="form-input"
                     value="{{ old('email', $user->email) }}" required>
                 @error('email')
-                    <small class="text-danger">{{ $message }}</small>
+                    <small class="text-error text-xs mt-1">{{ $message }}</small>
                 @enderror
             </div>
 
             {{-- Campo de selección de rol --}}
-            <div class="mb-3">
-                <label for="role_id" class="form-label">Rol</label>
+            <div class="mb-5">
+                <label for="role_id" class="block text-text-secondary text-sm font-medium mb-1">Rol</label>
                 <select name="role_id" id="role_id" class="form-select" required>
                     @foreach ($roles as $id => $name)
                         <option value="{{ $id }}" @selected($id == old('role_id', $userRole))>{{ ucfirst($name) }}</option>
                     @endforeach
                 </select>
                 @error('role_id')
-                    <small class="text-danger">{{ $message }}</small>
+                    <small class="text-error text-xs mt-1">{{ $message }}</small>
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">Contraseña (dejar en blanco para no cambiar)</label>
-                <div class="input-group">
-                    <input type="password" name="password" id="password" class="form-control" autocomplete="new-password">
-
-                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">Mostrar</button>
+            <div class="mb-5">
+                <label for="password" class="block text-text-secondary text-sm font-medium mb-1">Contraseña (dejar en blanco
+                    para no cambiar)</label>
+                <div class="flex">
+                    <input type="password" name="password" id="password" class="form-input rounded-r-none"
+                        autocomplete="new-password">
+                    <button type="button" class="btn btn-outline border-l-0 rounded-l-none"
+                        id="togglePassword">Mostrar</button>
                 </div>
                 @error('password')
-                    <small class="text-danger">{{ $message }}</small>
+                    <small class="text-error text-xs mt-1">{{ $message }}</small>
                 @enderror
             </div>
 
-            <div class="mb-3">
-                <label for="password_confirmation" class="form-label">Confirmar Contraseña</label>
-                <div class="input-group">
-                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control"
-                        autocomplete="new-password">
-
-                    <button type="button" class="btn btn-outline-secondary" id="togglePasswordConfirm">Mostrar</button>
+            <div class="mb-6">
+                <label for="password_confirmation" class="block text-text-secondary text-sm font-medium mb-1">Confirmar
+                    Contraseña</label>
+                <div class="flex">
+                    <input type="password" name="password_confirmation" id="password_confirmation"
+                        class="form-input rounded-r-none" autocomplete="new-password">
+                    <button type="button" class="btn btn-outline border-l-0 rounded-l-none"
+                        id="togglePasswordConfirm">Mostrar</button>
                 </div>
                 @error('password_confirmation')
-                    <small class="text-danger">{{ $message }}</small>
+                    <small class="text-error text-xs mt-1">{{ $message }}</small>
                 @enderror
             </div>
 
-            <button type="submit" class="btn btn-success">Guardar Cambios</button>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">Cancelar</a>
+            <div class="flex gap-3">
+                <button type="submit" class="btn btn-primary px-6 py-3 shadow-primary hover:shadow-primary-dark">Guardar
+                    Cambios</button>
+                <a href="{{ route('admin.users.index') }}"
+                    class="btn bg-gray-silver text-white hover:bg-gray-slate focus:ring-gray-silver px-6 py-3">Cancelar</a>
+            </div>
         </form>
     </div>
 

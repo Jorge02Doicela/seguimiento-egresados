@@ -3,58 +3,76 @@
 @section('title', 'Listado de Encuestas')
 
 @section('content')
+    <div class="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
+        <h1 class="text-3xl font-bold text-text-primary mb-6">Listado de Encuestas</h1>
 
-    <h1 class="text-2xl font-bold mb-4">Listado de Encuestas</h1>
-    <a href="{{ route('admin.surveys.dashboard') }}" class="btn btn-primary">
-        Estadísticas de Encuestas
-    </a>
-    <br>
-    <br>
+        <div class="mb-4 flex flex-wrap gap-3 items-center">
+            <a href="{{ route('admin.surveys.dashboard') }}"
+                class="btn btn-primary px-6 py-3 shadow-primary hover:shadow-primary-dark">
+                Estadísticas de Encuestas
+            </a>
+            <a href="{{ route('admin.surveys.create') }}"
+                class="btn btn-accent px-6 py-3 shadow-accent hover:shadow-accent-dark">Crear Nueva Encuesta</a>
+        </div>
 
-    <a href="{{ route('admin.surveys.create') }}" class="btn btn-primary mb-4">Crear Nueva Encuesta</a>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
+        @if (session('success'))
+            <div class="bg-success-lighter text-success-dark px-4 py-3 rounded-lg mb-6 shadow-sm" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
 
-    <table class="table-auto w-full border-collapse border border-gray-300">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="border border-gray-300 px-4 py-2">ID</th>
-                <th class="border border-gray-300 px-4 py-2">Título</th>
-                <th class="border border-gray-300 px-4 py-2">Carrera</th>
-                <th class="border border-gray-300 px-4 py-2">Activo</th>
-                <th class="border border-gray-300 px-4 py-2">Fecha Inicio</th>
-                <th class="border border-gray-300 px-4 py-2">Fecha Fin</th>
-                <th class="border border-gray-300 px-4 py-2">Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($surveys as $survey)
-                <tr>
-                    <td class="border border-gray-300 px-4 py-2">{{ $survey->id }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $survey->title }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $survey->career->name ?? '-' }}</td>
-                    <td class="border border-gray-300 px-4 py-2">{{ $survey->is_active ? 'Sí' : 'No' }}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        {{ $survey->start_date ? $survey->start_date->format('Y-m-d') : '-' }}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        {{ $survey->end_date ? $survey->end_date->format('Y-m-d') : '-' }}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        <a href="{{ route('admin.surveys.edit', $survey) }}" class="btn btn-sm btn-warning">Editar</a>
+        <div class="bg-white shadow-md rounded-2xl overflow-hidden mb-8">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr class="bg-gray-light border-b border-gray-lighter">
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">ID
+                        </th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">
+                            Título</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">
+                            Carrera</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">
+                            Activo</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">Fecha
+                            Inicio</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">Fecha
+                            Fin</th>
+                        <th class="px-5 py-3 text-left text-xs font-semibold text-text-muted uppercase tracking-wider">
+                            Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($surveys as $survey)
+                        <tr class="border-b border-gray-lighter hover:bg-bg-secondary transition-colors duration-200">
+                            <td class="px-5 py-4 text-sm text-text-secondary">{{ $survey->id }}</td>
+                            <td class="px-5 py-4 text-sm text-text-secondary">{{ $survey->title }}</td>
+                            <td class="px-5 py-4 text-sm text-text-secondary">{{ $survey->career->name ?? '-' }}</td>
+                            <td class="px-5 py-4 text-sm text-text-secondary">{{ $survey->is_active ? 'Sí' : 'No' }}</td>
+                            <td class="px-5 py-4 text-sm text-text-secondary">
+                                {{ $survey->start_date ? $survey->start_date->format('Y-m-d') : '-' }}</td>
+                            <td class="px-5 py-4 text-sm text-text-secondary">
+                                {{ $survey->end_date ? $survey->end_date->format('Y-m-d') : '-' }}</td>
+                            <td class="px-5 py-4 text-sm flex flex-wrap gap-2 items-center">
+                                <a href="{{ route('admin.surveys.edit', $survey) }}"
+                                    class="btn btn-sm bg-accent text-white hover:bg-accent-dark focus:ring-accent">Editar</a>
 
-                        <form action="{{ route('admin.surveys.destroy', $survey) }}" method="POST" class="inline-block"
-                            onsubmit="return confirm('¿Eliminar encuesta?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+                                <form action="{{ route('admin.surveys.destroy', $survey) }}" method="POST" class="inline"
+                                    onsubmit="return confirm('¿Eliminar encuesta?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                        class="btn btn-sm bg-error text-white hover:bg-error-dark focus:ring-error">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
 
-    {{ $surveys->links() }}
-
+        <div class="mt-6">
+            {{ $surveys->links() }}
+        </div>
+    </div>
 @endsection

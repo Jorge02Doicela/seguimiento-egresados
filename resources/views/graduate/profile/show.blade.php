@@ -38,25 +38,9 @@
                             class="text-text-secondary">{{ $graduate->company ?? 'No registrado' }}</span></p>
                     <p><strong>Cargo:</strong> <span
                             class="text-text-secondary">{{ $graduate->position ?? 'No registrado' }}</span></p>
-                    <p><strong>Salario:</strong> <span
+                    <p><strong>Salario $:</strong> <span
                             class="text-text-secondary">{{ $graduate->salary ?? 'No registrado' }}</span></p>
-                    <p><strong>Sector:</strong>
-                        @if ($graduate->sector)
-                            @php
-                                $sectorBadgeClass = '';
-                                if ($graduate->sector === 'privado') {
-                                    $sectorBadgeClass = 'badge-success';
-                                } elseif ($graduate->sector === 'público') {
-                                    $sectorBadgeClass = 'bg-primary-lightest text-primary'; // Using primary colors for public
-                                } elseif ($graduate->sector === 'freelance') {
-                                    $sectorBadgeClass = 'badge-warning';
-                                }
-                            @endphp
-                            <span class="badge {{ $sectorBadgeClass }}">{{ $graduate->sector }}</span>
-                        @else
-                            <span class="text-text-muted">No registrado</span>
-                        @endif
-                    </p>
+
                 </div>
             @endif
 

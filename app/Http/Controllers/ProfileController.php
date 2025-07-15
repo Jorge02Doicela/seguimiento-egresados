@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProfileController extends Controller
 {
@@ -56,5 +59,23 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    public function downloadCV()
+    {
+        $graduate = Auth::user()->graduate; // asumiendo relación User -> Graduate
+
+        if (!$graduate || !$graduate->cv_path) {
+            return redirect()->back()->with('error', 'No tienes un CV cargado.');
+        }
+
+        $cvPath = $graduate->cv_path; // ruta almacenada en DB, por ejemplo "cvs/archivo.pdf"
+
+        if (!Storage::disk('public')->exists($cvPath)) {
+            return redirect()->back()->with('error', 'El archivo no existe.');
+        }
+
+        // Descargar el archivo forzando descarga
+        return Storage::disk('public')->download($cvPath, 'CV_' . $graduate->user->name . '.pdf');
     }
 }

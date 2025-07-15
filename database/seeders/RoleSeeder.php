@@ -15,12 +15,12 @@ class RoleSeeder extends Seeder
         Role::firstOrCreate(['name' => 'graduate']);
         Role::firstOrCreate(['name' => 'employer']);
 
-        $adminEmail = 'admin@sucre.edu';
+        $adminEmail = 'admin.sucre@gmail.com';
         if (!User::where('email', $adminEmail)->exists()) {
             $admin = User::create([
                 'name' => 'Admin Sucre',
                 'email' => $adminEmail,
-                'password' => Hash::make('admin1234'),
+                'password' => Hash::make('Admin1234.'),
             ]);
             $admin->assignRole('admin');
         }

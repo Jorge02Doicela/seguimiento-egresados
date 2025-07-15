@@ -65,7 +65,8 @@
                     </select>
                 </div>
 
-                <div id="workFields" class="border-t border-border-primary pt-5 mt-5">
+                <div id="workFields"
+                    class="border-t border-border-primary pt-5 mt-5 {{ old('is_working', $graduate->is_working) ? '' : 'hidden' }}">
                     <h3 class="text-2xl font-headings text-text-primary mb-4">Detalles Laborales</h3>
                     <div class="mb-5">
                         <label for="company" class="block text-sm font-medium text-text-secondary mb-2">Empresa</label>
@@ -106,7 +107,7 @@
                         value="{{ old('position', $graduate->position) }}">
 
                     <div class="mb-5">
-                        <label for="salary" class="block text-sm font-medium text-text-secondary mb-2">Salario</label>
+                        <label for="salary" class="block text-sm font-medium text-text-secondary mb-2">Salario $</label>
                         <input type="number" step="0.01" name="salary" id="salary" class="form-input"
                             value="{{ old('salary', $graduate->salary) }}">
                     </div>
@@ -136,12 +137,6 @@
                                     href="{{ asset('storage/' . $graduate->cv_path) }}" target="_blank"
                                     class="text-primary hover:text-primary-dark">Ver CV</a></small>
                         @endif
-                    </div>
-
-                    <div class="mb-5">
-                        <label for="country" class="block text-sm font-medium text-text-secondary mb-2">País</label>
-                        <input type="text" name="country" id="country" class="form-input"
-                            value="{{ old('country', $graduate->country) }}">
                     </div>
 
                     <div class="mb-5">
@@ -201,12 +196,17 @@
 @endsection
 
 @section('scripts')
+@section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const techSelect = document.getElementById('tech_position');
             const nonTechContainer = document.getElementById('non_tech_container');
             const nonTechSelect = document.getElementById('non_tech_position');
             const finalPosition = document.getElementById('final_position');
+
+            const workFields = document.getElementById('workFields');
+            const workingYes = document.getElementById('working_yes');
+            const workingNo = document.getElementById('working_no');
 
             function updateFinalPosition() {
                 if (techSelect.value === 'otro') {
@@ -219,6 +219,15 @@
                 }
             }
 
+            function toggleWorkFields() {
+                if (workingYes.checked) {
+                    workFields.classList.remove('hidden');
+                } else {
+                    workFields.classList.add('hidden');
+                }
+            }
+
+            // Listeners
             techSelect.addEventListener('change', updateFinalPosition);
             nonTechSelect.addEventListener('change', () => {
                 if (techSelect.value === 'otro') {
@@ -226,7 +235,14 @@
                 }
             });
 
-            updateFinalPosition(); // Ejecutar al cargar para ajustar estado inicial
+            workingYes.addEventListener('change', toggleWorkFields);
+            workingNo.addEventListener('change', toggleWorkFields);
+
+            // Ejecutar al cargar
+            updateFinalPosition();
+            toggleWorkFields();
         });
     </script>
+@endsection
+
 @endsection

@@ -255,22 +255,19 @@
             function toggleEmployerFields() {
                 if (roleSelect.value === 'employer') {
                     employerFields.style.display = 'block';
-                    rucInput.setAttribute('required', 'required');
+                    if (rucInput) rucInput.setAttribute('required', 'required');
                 } else {
                     employerFields.style.display = 'none';
-                    rucInput.removeAttribute('required');
+                    if (rucInput) rucInput.removeAttribute('required');
                 }
             }
 
             roleSelect.addEventListener('change', toggleEmployerFields);
-
-            // Inicializar al cargar la página
             toggleEmployerFields();
 
-            // Opcional: validación sencilla antes de enviar
             registerForm.addEventListener('submit', (e) => {
                 if (roleSelect.value === 'employer') {
-                    if (!rucInput.value.trim()) {
+                    if (rucInput && !rucInput.value.trim()) {
                         e.preventDefault();
                         alert('El campo RUC es obligatorio para empleadores.');
                         rucInput.focus();
@@ -278,30 +275,38 @@
                 }
             });
 
-            // Opcional: botones para mostrar/ocultar contraseña
+            // Mostrar contraseña mientras se presiona el botón
             const btnShowPassword = document.getElementById('btn-show-password');
             const passwordInput = document.getElementById('password');
+
             btnShowPassword.addEventListener('mousedown', () => {
                 passwordInput.type = 'text';
             });
+
             btnShowPassword.addEventListener('mouseup', () => {
                 passwordInput.type = 'password';
             });
-            btnShowPassword.addEventListener('mouseout', () => {
+
+            btnShowPassword.addEventListener('mouseleave', () => {
                 passwordInput.type = 'password';
             });
 
             const btnShowPasswordConfirm = document.getElementById('btn-show-password-confirm');
             const passwordConfirmInput = document.getElementById('password_confirmation');
+
             btnShowPasswordConfirm.addEventListener('mousedown', () => {
                 passwordConfirmInput.type = 'text';
             });
+
             btnShowPasswordConfirm.addEventListener('mouseup', () => {
                 passwordConfirmInput.type = 'password';
             });
-            btnShowPasswordConfirm.addEventListener('mouseout', () => {
+
+            btnShowPasswordConfirm.addEventListener('mouseleave', () => {
                 passwordConfirmInput.type = 'password';
             });
         });
     </script>
+
+
 </x-guest-layout>

@@ -3,7 +3,7 @@
 @section('title', 'Buscar Egresados')
 
 @section('content')
-    <div class="container mx-auto p-4 md:p-8">
+    <div class="container mx-auto px-4 py-8 md:px-8">
         <h2 class="text-3xl font-headings text-text-primary mb-6">Buscar Egresados</h2>
 
         <form method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8 p-6 bg-white shadow-md rounded-lg"
@@ -87,7 +87,7 @@
             Mostrando <span class="font-semibold text-primary">{{ $graduates->total() }}</span> resultados
         </p>
 
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <div class="bg-white shadow-md rounded-lg overflow-x-auto"> {{-- Added overflow-x-auto for responsiveness --}}
             <table class="min-w-full divide-y divide-border-primary">
                 <thead class="bg-gray-lighter">
                     <tr>

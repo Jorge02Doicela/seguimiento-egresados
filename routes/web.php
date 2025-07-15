@@ -135,6 +135,8 @@ Route::middleware(['auth', 'role:graduate'])->prefix('graduate')->name('graduate
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
+    Route::get('/cv/download', [ProfileController::class, 'downloadCV'])->name('cv.download');
+
     // Rutas para encuestas generales (nuevas)
     Route::get('general-surveys', [GeneralSurveyController::class, 'index'])->name('general-surveys.index');
     Route::get('general-surveys/{survey}', [GeneralSurveyController::class, 'show'])->name('general-surveys.show');

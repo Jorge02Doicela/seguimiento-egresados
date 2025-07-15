@@ -128,12 +128,14 @@
                             class="w-full h-80 object-cover rounded-t-2xl" alt="Estadísticas Laborales">
                         <div class="p-8 flex flex-col flex-grow">
                             <h5 class="text-text-primary font-headings font-bold text-3xl text-center mb-5"><i
-                                    class="bi bi-graph-up-arrow mr-3 text-secondary"></i>Acceso a Estadísticas y Reportes</h5>
+                                    class="bi bi-graph-up-arrow mr-3 text-secondary"></i>Buscar talento</h5>
                             {{-- Aplicado text-text-primary --}}
                             <p class="text-xl text-text-light text-center font-body flex-grow leading-relaxed">
                                 {{-- Aplicado font-body --}}
-                                Visualice información agregada crucial sobre empleabilidad, sectores predominantes y tendencias
-                                salariales para apoyar la valiosa colaboración entre el sector productivo y el Instituto Sucre.
+                                Acceda a un buscador de egresados de la carrera de Desarrollo de Software del Instituto Sucre.
+                                Esta herramienta fortalece la articulación entre el Instituto y el sector productivo,
+                                facilitando procesos de reclutamiento, alianzas estratégicas y toma de decisiones basada en
+                                datos reales.
                             </p>
                         </div>
                     </div>
@@ -156,7 +158,7 @@
         {{-- Presentación general del proyecto --}}
         <div class="text-center mb-16 pt-8">
             <h1 class="font-bold text-primary font-headings text-4xl lg:text-6xl mb-4 animate-fade-in-down">
-                <i class="bi bi-box-seam mr-4 text-accent"></i>Sistema de Seguimiento Profesional de Egresados
+                <i class="t"></i>Sistema de Seguimiento Profesional de Egresados
                 {{-- Ajuste: Cambiado text-yellow-accent a text-accent --}}
             </h1>
             <p class="text-xl lg:text-2xl text-text-secondary font-body mt-4 max-w-4xl mx-auto animate-fade-in delay-200">
@@ -169,7 +171,7 @@
         <section class="mb-20 px-6 max-w-5xl mx-auto"> {{-- Ajuste: Mayor margen inferior y ancho máximo --}}
             <h2 class="mb-10 text-primary font-headings font-bold text-4xl text-center animate-fade-in-left">
                 {{-- Ajuste: Mayor margen inferior --}}
-                <i class="bi bi-info-circle-fill mr-4 text-accent"></i>¿Qué es? {{-- Ajuste: Cambiado text-yellow-accent a text-accent --}}
+                <i class=""></i>¿Qué es? {{-- Ajuste: Cambiado text-yellow-accent a text-accent --}}
             </h2>
             <p class="text-xl max-w-3xl mx-auto text-text-light font-body text-center mb-10 animate-fade-in delay-300">
                 {{-- Aplicado font-body --}}
@@ -181,7 +183,7 @@
                 <li
                     class="flex items-start py-4 card px-6 hover:shadow-lg transform hover:scale-105 transition-all duration-300 animate-slide-in-right delay-400 border border-gray-100">
                     {{-- Aplicado .card --}}
-                    <i class="bi bi-check-circle-fill text-3xl mr-5 flex-shrink-0 text-secondary"></i>
+                    <i class=""></i>
                     <span class="text-text-light font-body text-lg leading-relaxed">Registrar, centralizar y gestionar de
                         manera eficiente la información profesional detallada de sus egresados de la carrera de Desarrollo
                         de Software.</span> {{-- Aplicado font-body --}}
@@ -189,7 +191,7 @@
                 <li
                     class="flex items-start py-4 card px-6 hover:shadow-lg transform hover:scale-105 transition-all duration-300 animate-slide-in-right delay-500 border border-gray-100">
                     {{-- Aplicado .card --}}
-                    <i class="bi bi-check-circle-fill text-3xl mr-5 flex-shrink-0 text-secondary"></i>
+                    <i class=""></i>
                     <span class="text-text-light font-body text-lg leading-relaxed">Recolectar y analizar datos exhaustivos
                         sobre el empleo actual, habilidades adquiridas, sector laboral y ubicación geográfica de sus
                         graduados, obteniendo una visión completa.</span> {{-- Aplicado font-body --}}
@@ -197,7 +199,7 @@
                 <li
                     class="flex items-start py-4 card px-6 hover:shadow-lg transform hover:scale-105 transition-all duration-300 animate-slide-in-right delay-600 border border-gray-100">
                     {{-- Aplicado .card --}}
-                    <i class="bi bi-check-circle-fill text-3xl mr-5 flex-shrink-0 text-secondary"></i>
+                    <i class=""></i>
                     <span class="text-text-light font-body text-lg leading-relaxed">Generar reportes e indicadores clave de
                         desempeño laboral y empleabilidad, proporcionando información valiosa para apoyar decisiones
                         académicas e institucionales estratégicas.</span> {{-- Aplicado font-body --}}
@@ -205,7 +207,7 @@
                 <li
                     class="flex items-start py-4 card px-6 hover:shadow-lg transform hover:-translate-y-3 transition-all duration-300 animate-slide-in-right delay-700 border border-gray-100">
                     {{-- Aplicado .card --}}
-                    <i class="bi bi-check-circle-fill text-3xl mr-5 flex-shrink-0 text-secondary"></i>
+                    <i class=""></i>
                     <span class="text-text-light font-body text-lg leading-relaxed">Facilitar una comunicación fluida y
                         eficiente con los egresados mediante mensajes internos y notificaciones personalizadas,
                         fortaleciendo el vínculo de la comunidad Sucre.</span> {{-- Aplicado font-body --}}
@@ -213,117 +215,13 @@
                 <li
                     class="flex items-start py-4 card px-6 hover:shadow-lg transform hover:-translate-y-3 transition-all duration-300 animate-slide-in-right delay-800 border border-gray-100">
                     {{-- Aplicado .card --}}
-                    <i class="bi bi-check-circle-fill text-3xl mr-5 flex-shrink-0 text-secondary"></i>
+                    <i class=""></i>
                     <span class="text-text-light font-body text-lg leading-relaxed">Garantizar la máxima confidencialidad y
                         seguridad de todos los datos personales y laborales, aplicando las mejores prácticas en protección
                         de la información.</span> {{-- Aplicado font-body --}}
                 </li>
             </ul>
         </section>
-
-        <div class="border-t-2 border-gray-200 my-16 w-2/3 mx-auto"></div>
-
-        {{-- Objetivos generales y específicos --}}
-        <section
-            class="mb-20 bg-white p-10 rounded-2xl shadow-2xl max-w-5xl mx-auto animate-fade-in-up border border-primary-lightest">
-            {{-- Ajuste: Mayor margen inferior, ancho máximo y borde sutil --}}
-            <h2 class="mb-8 text-center font-bold text-primary font-headings text-4xl">
-                <i class="bi bi-bullseye mr-4 text-accent"></i>Objetivo General {{-- Ajuste: Cambiado text-yellow-accent a text-accent --}}
-            </h2>
-            <p class="text-xl text-center text-text-light mb-12 font-body max-w-3xl mx-auto leading-relaxed">
-                {{-- Aplicado font-body --}}
-                Desarrollar un sistema web altamente responsivo y seguro que permita registrar, gestionar y analizar de
-                forma integral los datos laborales, fortaleciendo así el vínculo duradero con nuestros valiosos egresados.
-            </p>
-
-            <h3 class="mt-10 mb-8 text-center font-bold text-primary font-headings text-3xl">
-                <i class="bi bi-list-check mr-4 text-accent"></i>Objetivos Específicos {{-- Ajuste: Cambiado text-yellow-accent a text-accent --}}
-            </h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                {{-- Objetivo 1 --}}
-                <div class="w-full">
-                    <div class="card h-full flex flex-col animate-slide-in-left delay-100 border border-gray-100">
-                        {{-- Aplicado .card, Borde sutil --}}
-                        <div
-                            class="bg-gradient-to-r from-secondary to-primary-dark text-white font-bold text-2xl px-8 py-5 rounded-t-xl font-headings flex items-center">
-                            <span
-                                class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-white text-primary mr-4 font-bold text-xl flex-shrink-0">1</span>Analizar
-                            las necesidades
-                        </div>
-                        <div class="p-7">
-                            <ul class="list-none mb-0 space-y-4 font-body text-lg text-text-light"> {{-- Aplicado font-body --}}
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Levantamiento
-                                        exhaustivo de requerimientos funcionales y no funcionales.</span></li>
-                                {{-- Ajuste: Cambiado text-green-500 a text-success --}}
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Realización
-                                        de entrevistas clave a egresados, empleadores y personal administrativo.</span></li>
-                                {{-- Ajuste: Cambiado text-green-500 a text-success --}}
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Identificación
-                                        de datos clave para un monitoreo y análisis precisos del desempeño
-                                        profesional.</span></li> {{-- Ajuste: Cambiado text-green-500 a text-success --}}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Objetivo 2 --}}
-                <div class="w-full">
-                    <div class="card h-full flex flex-col animate-slide-in-right delay-200 border border-gray-100">
-                        {{-- Aplicado .card, Borde sutil --}}
-                        <div
-                            class="bg-gradient-to-r from-secondary to-primary-dark text-white font-bold text-2xl px-8 py-5 rounded-t-xl font-headings flex items-center">
-                            <span
-                                class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-white text-primary mr-4 font-bold text-xl flex-shrink-0">2</span>Diseñar
-                            la solución
-                        </div>
-                        <div class="p-7">
-                            <ul class="list-none mb-0 space-y-4 font-body text-lg text-text-light"> {{-- Aplicado font-body --}}
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Arquitectura
-                                        escalable basada en MVC para facilitar mantenimiento y futuras mejoras.</span></li>
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Implementación
-                                        de base de datos MySQL optimizada con claves foráneas y normalización.</span></li>
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Interfaz
-                                        intuitiva y responsiva usando Tailwind CSS para una experiencia de usuario
-                                        excepcional.</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                {{-- Objetivo 3 --}}
-                <div class="w-full md:col-span-2">
-                    <div class="card h-full flex flex-col animate-fade-in-up delay-300 border border-gray-100">
-                        {{-- Aplicado .card, Borde sutil --}}
-                        <div
-                            class="bg-gradient-to-r from-secondary to-primary-dark text-white font-bold text-2xl px-8 py-5 rounded-t-xl font-headings flex items-center">
-                            <span
-                                class="inline-flex items-center justify-center h-10 w-10 rounded-full bg-white text-primary mr-4 font-bold text-xl flex-shrink-0">3</span>Desarrollar
-                            y desplegar
-                        </div>
-                        <div class="p-7">
-                            <ul class="list-none mb-0 space-y-4 font-body text-lg text-text-light"> {{-- Aplicado font-body --}}
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Codificación
-                                        limpia y documentada utilizando Laravel para robustez y seguridad.</span></li>
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Pruebas
-                                        exhaustivas para asegurar la calidad y la usabilidad antes del lanzamiento.</span>
-                                </li>
-                                <li class="flex items-start"><i
-                                        class="bi bi-check-circle-fill text-success mr-3 mt-1 flex-shrink-0"></i><span>Despliegue
-                                        en entorno productivo con monitoreo y soporte para evolución continua.</span></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
     </div>
+    </section>
 @endsection

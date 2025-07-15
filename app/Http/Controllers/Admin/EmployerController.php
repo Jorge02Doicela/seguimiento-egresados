@@ -50,29 +50,25 @@ class EmployerController extends Controller
      */
     public function update(Request $request, Employer $employer)
     {
-        // Validación de campos con regla unique ignorando el registro actual para tax_id
+        // Validar solo los campos visibles
         $data = $request->validate([
-            'company_name'    => 'required|string|max:255',
-            'contact_name'    => 'required|string|max:255',
-            'phone'          => 'nullable|string|max:20',
-            'address'        => 'nullable|string|max:255',
-            'company_email'  => 'nullable|email|max:255',
-            'company_phone'  => 'nullable|string|max:20',
-            'company_address' => 'nullable|string|max:255',
-            'website'        => 'nullable|url|max:255',
-            'sector'         => 'nullable|string|max:100',
-            'country'        => 'nullable|string|max:100',
-            'city'           => 'nullable|string|max:100',
-            'tax_id'         => 'nullable|string|max:100|unique:employers,tax_id,' . $employer->id,
+            'company_name' => 'required|string|max:255',
+            'phone'        => 'nullable|string|max:20',
+            'address'      => 'nullable|string|max:255',
+            'website'      => 'nullable|url|max:255',
+            'sector'       => 'nullable|string|max:100',
+            'city'         => 'nullable|string|max:100',
         ]);
 
-        // Actualizar datos en la base de datos
+        // Actualizar en base de datos
         $employer->update($data);
 
-        // Redireccionar a la lista con mensaje de éxito
+        // Redireccionar con mensaje
         return redirect()->route('admin.employers.index')
             ->with('success', 'Empleador actualizado correctamente.');
     }
+
+
 
     /**
      * Alternar el estado de verificación del empleador (toggle).

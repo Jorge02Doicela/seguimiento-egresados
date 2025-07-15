@@ -13,8 +13,8 @@ class EmployerSeeder extends Seeder
     {
         $user = User::create([
             'name' => 'Empleador Ejemplo',
-            'email' => 'empleador@empresa.com',
-            'password' => Hash::make('empleador123'),
+            'email' => 'empleador@gmail.com',
+            'password' => Hash::make('Empleador123.'),
         ]);
 
         $user->assignRole('employer');

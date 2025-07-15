@@ -11,12 +11,12 @@ class GraduateSeeder extends Seeder
 {
     public function run()
     {
-        $email = 'egresado1@sucre.edu';
+        $email = 'egresado@gmail.com';
         if (!User::where('email', $email)->exists()) {
             $user = User::create([
                 'name' => 'Egresado Ejemplo',
                 'email' => $email,
-                'password' => Hash::make('egresado123'),
+                'password' => Hash::make('Egresado123.'),
             ]);
             $user->assignRole('graduate');
 

@@ -114,13 +114,6 @@
                 </div>
             </x-dashboard.card>
 
-            <x-dashboard.card title="Distribución por País" icon="globe"
-                class="bg-blue-institutional text-white shadow-3xl animate-pop-in">
-                <div class="relative h-64"> {{-- Altura fija para gráficos --}}
-                    <canvas id="chartPaises"></canvas>
-                </div>
-            </x-dashboard.card>
-
             <x-dashboard.card title="Top Habilidades Técnicas" icon="cpu"
                 class="bg-accent text-white shadow-3xl animate-pop-in">
                 <div class="relative h-64"> {{-- Altura fija para gráficos --}}

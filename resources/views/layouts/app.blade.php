@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@yield('title', 'Gestión de Egresados ISUS')</title>
 
-    {{-- Import Vite styles and scripts (includes your Tailwind CSS) --}}
+    {{-- Import Vite styles and scripts (includes your Tailwind CSS and Tom Select CSS) --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     {{-- Bootstrap Icons for consistent iconography --}}
@@ -84,7 +84,7 @@
                             <li class="mb-2 lg:mb-0">
                                 <a class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200"
                                     href="{{ route('admin.dashboard') }}">
-                                    <i class="bi bi-speedometer2 mr-1"></i> Dashboard Admin
+                                    <i class="bi bi-speedometer2 mr-1"></i> Dashboard
                                 </a>
                             </li>
                             <li class="mb-2 lg:mb-0">
@@ -127,13 +127,12 @@
 
 
                         {{-- Enlace a Mensajes --}}
-                        {{-- Enlace a Mensajes --}}
                         <li class="mb-2 lg:mb-0">
                             <a href="{{ route('messages.inbox') }}"
                                 class="block py-2 px-3 rounded text-white hover:bg-accent transition-colors duration-200">
                                 <i class="bi bi-chat-left-text-fill mr-1"></i>
                                 @role('admin')
-                                    Mensajes y Notificaciones
+                                    Mensajes
                                 @else
                                     Mensajes
                                 @endrole
@@ -240,7 +239,7 @@
     @auth
         <script>
             (function() {
-                const TIEMPO_INACTIVIDAD_TOTAL = 20 * 60 * 1000;
+                const TIEMPO_INACTIVIDAD_TOTAL = 5 * 60 * 1000;
                 const TIEMPO_AVISO = 1 * 60 * 1000;
 
                 let timeoutCerrarSesion;
@@ -251,22 +250,14 @@
 
                     const modal = document.createElement('div');
                     modal.id = 'modal-inactividad';
-                    modal.style.position = 'fixed';
-                    modal.style.top = '0';
-                    modal.style.left = '0';
-                    modal.style.width = '100vw';
-                    modal.style.height = '100vh';
-                    modal.style.backgroundColor = 'rgba(0,0,0,0.6)';
-                    modal.style.display = 'flex';
-                    modal.style.justifyContent = 'center';
-                    modal.style.alignItems = 'center';
-                    modal.style.zIndex = '9999';
+                    modal.className =
+                    'fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-[9999] p-4'; // Tailwind classes
 
                     modal.innerHTML = `
-                        <div style="background: white; padding: 2rem; border-radius: 8px; max-width: 400px; text-align: center; font-family: sans-serif;">
-                            <h2 style="margin-bottom: 1rem;">Sesión próxima a cerrarse</h2>
-                            <p>Tu sesión cerrará en 1 minuto por inactividad. ¿Deseas continuar conectado?</p>
-                            <button id="btn-continuar-sesion" style="margin-top:1rem; padding: 0.5rem 1rem; cursor: pointer;">Continuar sesión</button>
+                        <div class="bg-white p-8 rounded-lg shadow-xl max-w-sm text-center text-text-primary font-body">
+                            <h2 class="text-xl font-semibold mb-4">Sesión próxima a cerrarse</h2>
+                            <p class="text-text-secondary mb-6">Tu sesión cerrará en 1 minuto por inactividad. ¿Deseas continuar conectado?</p>
+                            <button id="btn-continuar-sesion" class="btn btn-primary px-5 py-2">Continuar sesión</button>
                         </div>
                     `;
 
@@ -322,10 +313,7 @@
             ();
         </script>
     @endauth
-    <!-- Tom Select CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/tom-select/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
 
-    <!-- Tom Select JS -->
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
 
     @yield('scripts')
