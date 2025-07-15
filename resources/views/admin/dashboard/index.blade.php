@@ -31,15 +31,42 @@
             </div>
 
             <div>
-                <label for="sector" class="block text-gray-corporate text-sm font-semibold mb-2">Sector</label>
-                <select name="sector" id="sector"
+                <label for="main_sector" class="block text-gray-corporate text-sm font-semibold mb-2">Sector</label>
+                <select name="main_sector" id="main_sector"
                     class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-secondary focus:ring-blue-secondary transition duration-200 ease-in-out px-4 py-2.5 text-text-main">
                     <option value="">Todos</option>
-                    <option value="privado" @selected(request('sector') == 'privado')>Privado</option>
-                    <option value="público" @selected(request('sector') == 'público')>Público</option>
-                    <option value="freelance" @selected(request('sector') == 'freelance')>Freelance</option>
+                    <option value="tecnologico" @selected(request('main_sector') == 'tecnologico')>Sector Tecnológico</option>
+                    <option value="otro" @selected(request('main_sector') == 'otro')>Otro</option>
                 </select>
             </div>
+
+            <div id="tech_sector_container" class="hidden">
+                <label for="tech_sector" class="block text-gray-corporate text-sm font-semibold mb-2">Sector
+                    Tecnológico</label>
+                <select name="tech_sector" id="tech_sector"
+                    class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-secondary focus:ring-blue-secondary transition duration-200 ease-in-out px-4 py-2.5 text-text-main">
+                    <option value="">Seleccione un sector tecnológico</option>
+                    <option value="software" @selected(request('tech_sector') == 'software')>Software</option>
+                    <option value="hardware" @selected(request('tech_sector') == 'hardware')>Hardware</option>
+                    <option value="telecomunicaciones" @selected(request('tech_sector') == 'telecomunicaciones')>Telecomunicaciones</option>
+                    <option value="ia" @selected(request('tech_sector') == 'ia')>Inteligencia Artificial</option>
+                    <option value="otro_no_tecnologico" @selected(request('tech_sector') == 'otro_no_tecnologico')>Otro</option>
+                </select>
+            </div>
+
+            <div id="non_tech_sector_container" class="hidden">
+                <label for="non_tech_sector" class="block text-gray-corporate text-sm font-semibold mb-2">Sector No
+                    Tecnológico</label>
+                <select name="non_tech_sector" id="non_tech_sector"
+                    class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-secondary focus:ring-blue-secondary transition duration-200 ease-in-out px-4 py-2.5 text-text-main">
+                    <option value="">Seleccione un sector no tecnológico</option>
+                    <option value="salud" @selected(request('non_tech_sector') == 'salud')>Salud</option>
+                    <option value="educacion" @selected(request('non_tech_sector') == 'educacion')>Educación</option>
+                    <option value="finanzas" @selected(request('non_tech_sector') == 'finanzas')>Finanzas</option>
+                    <option value="industrial" @selected(request('non_tech_sector') == 'industrial')>Industrial</option>
+                </select>
+            </div>
+
 
             <div>
                 <label for="gender" class="block text-gray-corporate text-sm font-semibold mb-2">Género</label>
@@ -50,13 +77,6 @@
                     <option value="F" @selected(request('gender') == 'F')>Femenino</option>
                     <option value="Otro" @selected(request('gender') == 'Otro')>Otro</option>
                 </select>
-            </div>
-
-            <div>
-                <label for="position" class="block text-gray-corporate text-sm font-semibold mb-2">Buscar puesto</label>
-                <input type="text" name="position" id="position" value="{{ request('position') }}"
-                    placeholder="Ej. Desarrollador"
-                    class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-secondary focus:ring-blue-secondary transition duration-200 ease-in-out px-4 py-2.5 text-text-main placeholder-text-light" />
             </div>
 
             <div>
@@ -94,13 +114,6 @@
                 </div>
             </x-dashboard.card>
 
-            <x-dashboard.card title="Distribución por Sector Laboral" icon="briefcase"
-                class="bg-secondary text-white shadow-3xl animate-pop-in">
-                <div class="relative h-64"> {{-- Altura fija para gráficos --}}
-                    <canvas id="chartSectores"></canvas>
-                </div>
-            </x-dashboard.card>
-
             <x-dashboard.card title="Distribución por País" icon="globe"
                 class="bg-blue-institutional text-white shadow-3xl animate-pop-in">
                 <div class="relative h-64"> {{-- Altura fija para gráficos --}}
@@ -128,6 +141,21 @@
                     <canvas id="chartCiudades"></canvas>
                 </div>
             </x-dashboard.card>
+
+            <x-dashboard.card title="Top Puestos Tecnológicos" icon="cpu"
+                class="bg-green-600 text-white shadow-3xl animate-pop-in">
+                <div class="relative h-64">
+                    <canvas id="chartPuestosTech"></canvas>
+                </div>
+            </x-dashboard.card>
+
+            <x-dashboard.card title="Top Puestos No Tecnológicos" icon="hammer"
+                class="bg-red-600 text-white shadow-3xl animate-pop-in">
+                <div class="relative h-64">
+                    <canvas id="chartPuestosNoTech"></canvas>
+                </div>
+            </x-dashboard.card>
+
         </div>
 
         {{-- Tabla de salarios por puesto --}}
@@ -242,50 +270,7 @@
             }
         });
 
-        // Chart Sectores
-        new Chart(document.getElementById('chartSectores'), {
-            type: 'doughnut',
-            data: {
-                labels: {!! json_encode($sectorData->pluck('sector')) !!},
-                datasets: [{
-                    data: {!! json_encode($sectorData->pluck('total')) !!},
-                    backgroundColor: ['#3B82F6', '#F59E0B', '#1E3A8A', '#E08D00', '#BFD7ED', '#142d6d'],
-                    borderColor: '#1F2937', // dark para mejor contraste
-                    borderWidth: 2
-                }]
-            },
-            options: {
-                ...baseChartOptions, // Hereda opciones base
-                plugins: {
-                    ...baseChartOptions.plugins,
-                    legend: {
-                        position: 'bottom',
-                        labels: {
-                            color: '#BFD7ED', // logo-blue-200
-                            font: {
-                                family: 'Open Sans',
-                                size: 12
-                            },
-                            boxWidth: 20, // Tamaño de las cajas de color en la leyenda
-                            padding: 15
-                        }
-                    },
-                    tooltip: {
-                        ...baseChartOptions.plugins.tooltip,
-                        backgroundColor: 'rgba(59, 130, 246, 0.9)', // secondary
-                        borderColor: '#3B82F6' // secondary
-                    }
-                },
-                scales: { // Eliminar escalas para Doughnut/Pie charts
-                    x: {
-                        display: false
-                    },
-                    y: {
-                        display: false
-                    }
-                }
-            }
-        });
+
 
         // Chart Paises
         new Chart(document.getElementById('chartPaises'), {
@@ -362,7 +347,8 @@
                 datasets: [{
                     data: {!! json_encode($genderData->pluck('total')) !!},
                     backgroundColor: ['#6B7280', '#EF4444', '#10B981',
-                    '#BFD7ED'], // gray, red, green, logo-blue-200
+                        '#BFD7ED'
+                    ], // gray, red, green, logo-blue-200
                     borderColor: '#1F2937', // dark
                     borderWidth: 2
                 }]
@@ -431,6 +417,79 @@
                     }
                 }
             }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainSector = document.getElementById('main_sector');
+            const techContainer = document.getElementById('tech_sector_container');
+            const nonTechContainer = document.getElementById('non_tech_sector_container');
+            const techSector = document.getElementById('tech_sector');
+            const nonTechSector = document.getElementById('non_tech_sector');
+
+            function updateVisibility() {
+                if (mainSector.value === 'tecnologico') {
+                    techContainer.classList.remove('hidden');
+                    nonTechContainer.classList.add('hidden');
+                    if (techSector.value === 'otro_no_tecnologico') {
+                        nonTechContainer.classList.remove('hidden');
+                    }
+                } else if (mainSector.value === 'otro') {
+                    techContainer.classList.add('hidden');
+                    nonTechContainer.classList.remove('hidden');
+                } else {
+                    techContainer.classList.add('hidden');
+                    nonTechContainer.classList.add('hidden');
+                    techSector.value = '';
+                    nonTechSector.value = '';
+                }
+            }
+
+
+            mainSector.addEventListener('change', () => {
+                techSector.value = '';
+                nonTechSector.value = '';
+                updateVisibility();
+            });
+
+            techSector.addEventListener('change', () => {
+                if (techSector.value !== 'otro_no_tecnologico') {
+                    nonTechSector.value = '';
+                }
+                updateVisibility();
+            });
+
+            nonTechSector.addEventListener('change', updateVisibility);
+
+            // Ejecutar al cargar para mantener estado con request actual
+            updateVisibility();
+        });
+        // Chart Puestos Tecnológicos
+        new Chart(document.getElementById('chartPuestosTech'), {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($techPositionData->pluck('position')) !!},
+                datasets: [{
+                    data: {!! json_encode($techPositionData->pluck('total')) !!},
+                    backgroundColor: '#16A34A',
+                    borderRadius: 8,
+                    barPercentage: 0.7
+                }]
+            },
+            options: baseChartOptions
+        });
+
+        // Chart Puestos No Tecnológicos
+        new Chart(document.getElementById('chartPuestosNoTech'), {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($nonTechPositionData->pluck('non_tech_position')) !!},
+                datasets: [{
+                    data: {!! json_encode($nonTechPositionData->pluck('total')) !!},
+                    backgroundColor: '#EF4444',
+                    borderRadius: 8,
+                    barPercentage: 0.7
+                }]
+            },
+            options: baseChartOptions
         });
     </script>
 @endsection

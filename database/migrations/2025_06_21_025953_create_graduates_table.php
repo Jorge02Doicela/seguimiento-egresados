@@ -15,7 +15,8 @@ class CreateGraduatesTable extends Migration
             $table->enum('gender', ['M', 'F', 'Otro'])->nullable();
             $table->foreignId('career_id')->nullable()->constrained()->onDelete('set null');
             $table->string('company')->nullable();
-            $table->string('position')->nullable();
+            $table->string('position')->nullable(); // Tecnológico
+            $table->string('non_tech_position')->nullable(); // No tecnológico
             $table->boolean('is_working')->default(false);
             $table->text('salary')->nullable();
             $table->enum('sector', ['privado', 'público', 'freelance'])->nullable();

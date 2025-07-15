@@ -24,7 +24,9 @@ class DashboardController extends Controller
         $validated = $request->validate([
             'year_from' => 'nullable|integer|min:1900|max:' . date('Y'),
             'year_to' => 'nullable|integer|min:1900|max:' . date('Y'),
-            'sector' => 'nullable|in:privado,público,freelance',
+            'main_sector' => 'nullable|in:tecnologico,otro',
+            'tech_sector' => 'nullable|in:software,hardware,telecomunicaciones,ia,otro_no_tecnologico',
+            'non_tech_sector' => 'nullable|in:salud,educacion,finanzas,industrial',
             'gender' => 'nullable|in:M,F,Otro',
             'position' => 'nullable|string|max:100',
         ]);
@@ -32,9 +34,29 @@ class DashboardController extends Controller
         // Asignar variables con valores validados o null si no vienen
         $yearFrom = $validated['year_from'] ?? null;
         $yearTo = $validated['year_to'] ?? null;
-        $sector = $validated['sector'] ?? null;
+        $mainSector = $validated['main_sector'] ?? null;
+        $techSector = $validated['tech_sector'] ?? null;
+        $nonTechSector = $validated['non_tech_sector'] ?? null;
         $gender = $validated['gender'] ?? null;
         $position = $validated['position'] ?? null;
+
+        // ------------------------------------------------------
+        // Construcción del filtro sector final según jerarquía
+        // ------------------------------------------------------
+        $sector = null;
+        if ($mainSector) {
+            if ($mainSector === 'tecnologico') {
+                if ($techSector) {
+                    if ($techSector === 'otro_no_tecnologico' && $nonTechSector) {
+                        $sector = $nonTechSector;
+                    } else {
+                        $sector = $techSector;
+                    }
+                }
+            } else {
+                $sector = $mainSector;
+            }
+        }
 
         // ------------------------------------------------------
         // Construcción de consulta base para egresados con filtros
@@ -77,6 +99,30 @@ class DashboardController extends Controller
             ->select('position', DB::raw('AVG(salary) as average_salary'))
             ->groupBy('position')
             ->orderByDesc('average_salary')
+            ->limit(5)
+            ->get();
+
+        // --------------------------------------
+        // Nuevos datos para gráficos por tipo de puesto
+        // --------------------------------------
+
+        // Puestos tecnológicos (position distinto de 'otro')
+        $techPositionData = (clone $graduatesQuery)
+            ->whereNotNull('position')
+            ->where('position', '!=', 'otro')
+            ->select('position', DB::raw('COUNT(*) as total'))
+            ->groupBy('position')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        // Puestos no tecnológicos (position == 'otro', contando non_tech_position)
+        $nonTechPositionData = (clone $graduatesQuery)
+            ->where('position', 'otro')
+            ->whereNotNull('non_tech_position')
+            ->select('non_tech_position', DB::raw('COUNT(*) as total'))
+            ->groupBy('non_tech_position')
+            ->orderByDesc('total')
             ->limit(5)
             ->get();
 
@@ -164,7 +210,9 @@ class DashboardController extends Controller
         $totalGraduates = (clone $graduatesQuery)->count();
 
         // Se usa Answer para contar usuarios distintos que respondieron
-        $graduatesWithAnswers = Answer::distinct('user_id')->count('user_id');
+        $graduateIds = (clone $graduatesQuery)->pluck('user_id'); // obtiene los user_id de egresados filtrados
+
+        $graduatesWithAnswers = Answer::whereIn('user_id', $graduateIds)->distinct('user_id')->count('user_id');
 
         $surveyParticipationRate = $totalGraduates > 0
             ? round(($graduatesWithAnswers / $totalGraduates) * 100, 2)
@@ -181,6 +229,8 @@ class DashboardController extends Controller
         return view('admin.dashboard.index', compact(
             'cohortData',
             'salaryData',
+            'techPositionData',
+            'nonTechPositionData',
             'sectorData',
             'countryData',
             'genderData',

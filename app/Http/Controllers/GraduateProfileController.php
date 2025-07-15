@@ -45,26 +45,40 @@ class GraduateProfileController extends Controller
     {
         $graduate = Graduate::where('user_id', Auth::id())->firstOrFail();
 
+        // Validaciones incluyendo los campos position y non_tech_position
         $validated = $request->validate([
             'cohort_year' => 'required|integer|min:1900|max:' . date('Y'),
             'gender' => 'required|in:M,F,Otro',
             'is_working' => 'required|boolean',
             'company' => 'nullable|string|max:255',
-            'position' => 'nullable|string|max:255',
             'salary' => 'nullable|numeric|min:0',
-            'sector' => 'nullable|in:privado,público,freelance',
             'portfolio_url' => 'nullable|url|max:255',
             'cv' => 'nullable|file|mimes:pdf,doc,docx|max:2048',
             'country' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:255',
             'career_id' => 'nullable|exists:careers,id',
+
+            // Validar position y non_tech_position
+            'position' => 'nullable|string|max:100',
+            'non_tech_position' => 'nullable|string|max:100',
         ]);
 
-        $graduate->fill($validated);
+        // Guardar los campos position y non_tech_position directamente
+        $graduate->position = $validated['position'] ?? null;
+        $graduate->non_tech_position = $validated['non_tech_position'] ?? null;
 
-        // Opcionalmente explícito:
-        // $graduate->career_id = $request->career_id;
+        // El resto de campos masivos
+        $graduate->cohort_year = $validated['cohort_year'];
+        $graduate->gender = $validated['gender'];
+        $graduate->is_working = $validated['is_working'];
+        $graduate->company = $validated['company'] ?? null;
+        $graduate->salary = $validated['salary'] ?? null;
+        $graduate->portfolio_url = $validated['portfolio_url'] ?? null;
+        $graduate->country = $validated['country'] ?? null;
+        $graduate->city = $validated['city'] ?? null;
+        $graduate->career_id = $validated['career_id'] ?? null;
 
+        // Manejo del archivo CV
         if ($request->hasFile('cv')) {
             if ($graduate->cv_path && Storage::disk('public')->exists($graduate->cv_path)) {
                 Storage::disk('public')->delete($graduate->cv_path);
@@ -80,6 +94,8 @@ class GraduateProfileController extends Controller
             ->route('graduate.profile.show')
             ->with('success', 'Perfil actualizado correctamente.');
     }
+
+
 
     /**
      * Agrega una habilidad al egresado.
